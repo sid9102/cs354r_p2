@@ -6,7 +6,7 @@ material Material.001
 
     technique
     {
-        pass Material.001
+        pass
         {
             ambient 0.0 0.08574485778808594 0.800000011920929 1.0
             diffuse 0.0 0.06859588725262711 0.6400000190734865 1.0
