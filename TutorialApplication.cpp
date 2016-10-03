@@ -79,7 +79,7 @@ void TutorialApplication::createScene(void)
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 	//Gravity set here, we need very light gravity (towards the paddle?)
-	dynamicsWorld->setGravity(btVector3(0, -10, 0));
+	dynamicsWorld->setGravity(btVector3(-10, 0, 0));
 
 	// The physics object representing our ball
 	physBall = new btSphereShape(ball->radius);
@@ -121,9 +121,11 @@ void TutorialApplication::createScene(void)
 	for (int i = 0; i < 4; i++) {
 		wallRigidBody.at(i)->setFriction(1.0);
 		wallRigidBody.at(i)->setRollingFriction(1.0);
-		wallRigidBody.at(i)->setRestitution(1.0);
+		wallRigidBody.at(i)->setRestitution(0);
 		dynamicsWorld->addRigidBody(wallRigidBody.at(i));
 	}
+	wallRigidBody.at(0)->setUserIndex(1500);
+
 	ceilRigidBody = new btRigidBody(ceilRigidBodyCI);
 	ceilRigidBody->setFriction(1.0);
 	ceilRigidBody->setRollingFriction(1.0);
@@ -142,8 +144,9 @@ void TutorialApplication::createScene(void)
 	physBallRigidBody = new btRigidBody(physBallRigidBodyCI);
 
 	//set initial velocity of ball
-	physBallRigidBody->setLinearVelocity(btVector3(40, 0, -20));
-	physBallRigidBody->setRestitution(1.6);
+	physBallRigidBody->setLinearVelocity(btVector3(0, 40, -20));
+	physBallRigidBody->setRestitution(1.0);
+	physBallRigidBody->setUserIndex(1000);
 	physBallRigidBody->setFriction(1.0);
 	physBallRigidBody->setRollingFriction(1.0);
 	dynamicsWorld->addRigidBody(physBallRigidBody);
