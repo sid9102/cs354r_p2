@@ -1,4 +1,4 @@
-#include "Physics.h";
+#include "Physics.h"
 
 Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 	// Helps eliminate pairs of object that should not collide
@@ -61,7 +61,7 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 		wallRigidBody.at(i)->setRestitution(0);
 		dynamicsWorld->addRigidBody(wallRigidBody.at(i));
 	}
-	wallRigidBody.at(1)->setRestitution(1.5);
+	wallRigidBody.at(1)->setRestitution(1.0);
 	wallRigidBody.at(0)->setUserPointer(wallRigidBody.at(0));
 	userIndex[wallRigidBody.at(0)->getUserPointer()] = 1500;
 
@@ -117,7 +117,7 @@ void Physics::checkCollide() {
 			{
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
-						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 800), (rand() % 40) - 20, (rand() % 40) - 20));
+						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 200) + 100, (rand() % 40) - 20, (rand() % 40) - 20));
 			}
 		}
 	}

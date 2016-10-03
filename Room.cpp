@@ -1,5 +1,4 @@
 #include "Room.h"
-#include <SDL2/SDL.h>
 Room::Room() {
 	roomLength = roomWidth = roomHeight = 500;
 	xOffset = yOffset = zOffset = 250;

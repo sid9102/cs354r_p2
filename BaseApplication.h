@@ -49,7 +49,6 @@ http://www.ogre3d.org/wiki/
 #include "Sphere.h"
 #include "Room.h"
 #include "Physics.h"
-#include "Sound.h"
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
