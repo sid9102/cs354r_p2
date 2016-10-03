@@ -311,6 +311,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	*/
 	btTransform trans;
 	int len = balls.size();
+	int index;
 	for (int i = 0; i < len; i++) {
 		engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
 		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
@@ -320,7 +321,10 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	TimeStepAccumulator += TimeStep;
 	if (TimeStepAccumulator >= TimeStep) {
 		engine->update();
-		engine->checkCollide();
+		index = engine->checkCollide();
+		if (index > 0) {
+			blocks.at(index) = NULL;
+		}
 		TimeStepAccumulator = 0.0;
 	}
 

@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
+Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space) {
 	// Helps eliminate pairs of object that should not collide
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -20,6 +20,11 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 	int len = balls.size();
 	for(int i = 0; i < len; i++)
 		ballShape.push_back(new btSphereShape(balls.at(i)->radius));
+
+	// Create blocks
+	len = blocks.size();
+	for (int i = 0; i < len; i++)
+		blockShape.push_back(new btBoxShape(btVector3(5, 2, 2)));
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
@@ -49,6 +54,8 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 	groundRigidBody->setFriction(1.0);
 	groundRigidBody->setRollingFriction(1.0);
 	groundRigidBody->setRestitution(1.0);
+	groundRigidBody->setUserPointer(groundRigidBody);
+	userIndex[groundRigidBody->getUserPointer()] == 5500;
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
 	wallRigidBody.push_back(new btRigidBody(wallRigidBodyCI));
@@ -63,19 +70,30 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 	}
 	wallRigidBody.at(1)->setRestitution(1.0);
 	wallRigidBody.at(0)->setUserPointer(wallRigidBody.at(0));
+	wallRigidBody.at(1)->setUserPointer(wallRigidBody.at(1));
+	wallRigidBody.at(2)->setUserPointer(wallRigidBody.at(2));
+	wallRigidBody.at(3)->setUserPointer(wallRigidBody.at(3));
 	userIndex[wallRigidBody.at(0)->getUserPointer()] = 1500;
+	userIndex[wallRigidBody.at(1)->getUserPointer()] = 2500;
+	userIndex[wallRigidBody.at(2)->getUserPointer()] = 3500;
+	userIndex[wallRigidBody.at(3)->getUserPointer()] = 4500;
 
 	ceilRigidBody = new btRigidBody(ceilRigidBodyCI);
 	ceilRigidBody->setFriction(1.0);
 	ceilRigidBody->setRollingFriction(1.0);
 	ceilRigidBody->setRestitution(1.0);
 	dynamicsWorld->addRigidBody(ceilRigidBody);
+	ceilRigidBody->setUserPointer(ceilRigidBody);
+	userIndex[ceilRigidBody->getUserPointer()] = 6500;
 
 	// Set mass and motion for the ball
 	// NOTE: The btVector 3 here is the starting position for the ball
 	ballMass = 1;
+	blockMass = 0;
 	ballInertia = btVector3(0, 0, 0);
+	blockInertia = btVector3(0, 0, 0);
 
+	len = balls.size();
 	for (int j = 0; j < len; j++) {
 		ballMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 400, 0))));
 
@@ -94,11 +112,24 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space) {
 		ballRigidBody.at(j)->setRollingFriction(1.0);
 		dynamicsWorld->addRigidBody(ballRigidBody.at(j));
 	}
+	
+	len = blocks.size();
+	for (int j = 0; j < len; j++) {
+		blockShape.at(j)->calculateLocalInertia(blockMass, blockInertia);
+		blockMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))));
+		btRigidBody::btRigidBodyConstructionInfo blockRigidBodyCI(blockMass, blockMotionState.at(j), blockShape.at(j), blockInertia);
+		blockRigidBody.push_back(new btRigidBody(blockRigidBodyCI));
 
-	timerStart = true;
+		blockRigidBody.at(j)->setUserPointer(blockRigidBody.at(j));
+		userIndex[blockRigidBody.at(j)->getUserPointer()] = j;
+		blockRigidBody.at(j)->setFriction(1.0);
+		blockRigidBody.at(j)->setRollingFriction(1.0);
+		blockRigidBody.at(j)->setRestitution(1.0);
+		dynamicsWorld->addRigidBody(blockRigidBody.at(j));
+	}
 }
 
-void Physics::checkCollide() {
+int Physics::checkCollide() {
 	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
 	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i<numManifolds; i++)
@@ -118,9 +149,23 @@ void Physics::checkCollide() {
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
 						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 200) + 100, (rand() % 40) - 20, (rand() % 40) - 20));
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 100) {
+					if (userIndex[obA->getUserPointer()] < 100 || userIndex[obB->getUserPointer()] < 100) {
+						if (userIndex[obA->getUserPointer()] < 100) {
+							blockShape.at(userIndex[obA->getUserPointer()]) = NULL;
+							blockRigidBody.at(userIndex[obA->getUserPointer()]) = NULL;
+							return userIndex[obA->getUserPointer()];
+						} else {
+							blockShape.at(userIndex[obB->getUserPointer()]) = NULL;
+							blockRigidBody.at(userIndex[obB->getUserPointer()]) = NULL;
+							return userIndex[obB->getUserPointer()];
+						}
+					}
+				}
 			}
 		}
 	}
+	return -1;
 }
 
 void Physics::update() {
@@ -129,7 +174,6 @@ void Physics::update() {
 
 Physics::~Physics() {
 	// Clean up once the simulation ends
-	timerStart = false;
 	delete dynamicsWorld;
 	delete solver;
 	delete dispatcher;

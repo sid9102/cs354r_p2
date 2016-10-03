@@ -2,11 +2,11 @@
 #include "Block.h"
 
 Block::Block() {
-	type = paper;
+	t = paper;
 	durability = 1;
 	points = 1 ;
 	damage = 0;
-	powerup = 0;
+	powerup = none;
 	buildBlock();
 }
 
@@ -14,34 +14,34 @@ Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
 	Type type = t;
 	switch(type)
 	{
-		paper:
+		case(paper):
 		{
 			durability = 1;
 			points = 1 ;
 		}
-		wood:
+		case(wood):
 		{
 			durability = 2;
 			points = 2;
 		}
-		stone:
+		case(stone):
 		{
 			durability = 3;
 			points = 3;
 		}
-		brick:
+		case(brick):
 		{
 			durability = 4;
 			points = 4;
 		}
-		metal:
+		case(metal):
 		{
 			durability = 1000;
 			points = 0;
 		}
 	}
 	damage = 0;
-	powerup = 0;
+	powerup = none;
 	blockManager = newManager;
 	buildBlock();
 }
@@ -54,24 +54,24 @@ Ogre::Vector3 Block::getPos() {
 	return Ogre::Vector3(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
 }
 
-void destroy()
+void Block::destroy()
 {
 }
 
-void collision()
+void Block::collision()
 {
 	damage++;
 }
 
-int getID()
+int Block::getID()
 {
 	return id;
 }
 
 
-void Sphere::buildBlock() {
+void Block::buildBlock() {
 	blockNode = blockManager->getRootSceneNode()->createChildSceneNode();
-	switch(type)
+	switch(t)
 	{
 		case(paper):
 		{
@@ -80,6 +80,7 @@ void Sphere::buildBlock() {
 		case(wood):
 		{
 			blockEntity = blockManager->createEntity("woodBlock"+getID(), "wood.mesh");
+			blockNode->attachObject(blockEntity);
 		}
 		case(stone):
 		{

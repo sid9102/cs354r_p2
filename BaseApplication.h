@@ -47,6 +47,7 @@ http://www.ogre3d.org/wiki/
 #endif
 
 #include "Sphere.h"
+#include "Block.h"
 #include "Room.h"
 #include "Physics.h"
 
@@ -84,6 +85,7 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
+	std::vector<Block*> blocks;
 	Physics* engine;
 	double timeSinceLastFrame = 0;
 	double TimeStep = 1 / 60.0;

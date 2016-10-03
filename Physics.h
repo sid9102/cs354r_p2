@@ -9,15 +9,16 @@
 #include "Sphere.h"
 #include "Room.h"
 #include "Timer.h"
+#include "Block.h"
 class Physics
 {
 public:
 	std::map<void*, int> userIndex;
-	std::atomic<bool> timerStart;
-	Physics(std::vector<Sphere*> balls, Room* &space);
+	Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space);
 	~Physics();
 	std::vector<btRigidBody*> ballRigidBody;
-	void checkCollide();
+	std::vector<btRigidBody*> blockRigidBody;
+	int checkCollide();
 	void update();
 private:
 	// Timer for physics engine
@@ -32,6 +33,7 @@ private:
 
 	// Dynamic Objects
 	std::vector<btCollisionShape*> ballShape; // mass = 1
+	std::vector<btCollisionShape*> blockShape; // mass = 0;
 
 	// Static Objects
 	btCollisionShape* groundShape;
@@ -44,9 +46,12 @@ private:
 	btDefaultMotionState* ceilMotionState;
 	btRigidBody* ceilRigidBody;
 	std::vector<btDefaultMotionState*> ballMotionState;
+	std::vector<btDefaultMotionState*> blockMotionState;
 
 	// SetUp Ball Object
 	btScalar ballMass;
+	btScalar blockMass;
 	btVector3 ballInertia;
+	btVector3 blockInertia;
 };
 #endif // #ifndef __Physics_h_
