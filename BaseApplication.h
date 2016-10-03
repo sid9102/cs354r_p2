@@ -48,10 +48,8 @@ http://www.ogre3d.org/wiki/
 
 #include "Sphere.h"
 #include "Room.h"
+#include "Physics.h"
 #include "Sound.h"
-
-#include <btBulletDynamicsCommon.h>
-#include <BulletCollision/Gimpact/btGImpactCollisionAlgorithm.h>
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
@@ -86,31 +84,11 @@ public:
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
-	/*
-	Sphere* ball[5];
-	*/
-	Sphere* ball;
-	btBroadphaseInterface* broadphase;
-	btDefaultCollisionConfiguration* collisionConfiguration;
-	btCollisionDispatcher* dispatcher;
-	btSequentialImpulseConstraintSolver* solver;
-	btDiscreteDynamicsWorld* dynamicsWorld;
-	btCollisionShape* physBall;
-	// Copy all ground stuff for walls
-	btCollisionShape* groundShape;
-	btDefaultMotionState* groundMotionState;
-	btRigidBody* groundRigidBody;
-	std::vector<btCollisionShape*> wallShape;
-	std::vector<btDefaultMotionState*> wallMotionState;
-	std::vector<btRigidBody*> wallRigidBody;
-	btCollisionShape* ceilShape;
-	btDefaultMotionState* ceilMotionState;
-	btRigidBody* ceilRigidBody;
-	btDefaultMotionState* fallMotionState;
-	btScalar mass;
-	btVector3 fallIntertia;
-	btRigidBody* physBallRigidBody;
-	btTransform trans;
+	std::vector<Sphere*> balls;
+	Physics* engine;
+	double timeSinceLastFrame = 0;
+	double TimeStep = 1 / 60.0;
+	double TimeStepAccumulator = 0.0;
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
 protected:

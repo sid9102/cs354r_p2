@@ -309,33 +309,19 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		}
 	}
 	*/
-	
-	physBallRigidBody->getMotionState()->getWorldTransform(trans);
-	ball->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-	ball->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
-	dynamicsWorld->stepSimulation(1 / 60.f, 10);
-	
-	srand(STATE_SYSTEM_BUSY);
+	btTransform trans;
+	int len = balls.size();
+	for (int i = 0; i < len; i++) {
+		engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
+	}
 
-	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
-	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
-	for (int i = 0; i<numManifolds; i++)
-	{
-		btPersistentManifold* contactManifold = dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
-		btCollisionObject* obA = (btCollisionObject*)(contactManifold->getBody0());
-		btCollisionObject* obB = (btCollisionObject*)(contactManifold->getBody1());
-
-		int numContacts = contactManifold->getNumContacts();
-		for (int j = 0; j < numContacts; j++)
-		{
-			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			if ((pt.getDistance() <= 0 + 0.0001)||(pt.getDistance() <= 0 - 0.0001))
-			{
-				if (obA->getUserIndex() == 1000 || obA->getUserIndex() == 1500)
-					if (obB->getUserIndex() == 1500 || obB->getUserIndex() == 1000)
-						physBallRigidBody->setLinearVelocity(btVector3((rand() % 800), (rand() % 40) - 20, (rand() % 40) - 20));
-			}
-		}
+	TimeStepAccumulator += TimeStep;
+	if (TimeStepAccumulator >= TimeStep) {
+		engine->update();
+		engine->checkCollide();
+		TimeStepAccumulator = 0.0;
 	}
 
 	//ball->update();

@@ -9,6 +9,12 @@
 class Room
 {
 	public:
+		int roomHeight;
+		int roomLength;
+		int roomWidth;
+		int xOffset;
+		int yOffset;
+		int zOffset;
 		Room();
 		Room(Ogre::SceneManager *newManager);
 		Room(int xyz, Ogre::SceneManager *newManager);
@@ -16,12 +22,6 @@ class Room
 		void checkCollide(Sphere* ball);
 		void checkCollide(Sphere* ball, Sphere* ball2);
 	private:
-		int roomHeight;
-		int roomLength;
-		int roomWidth;
-		int xOffset;
-		int yOffset;
-		int zOffset;
 		Ogre::Entity* groundEntity;
 		Ogre::Entity* wallEntity;
 		Ogre::SceneNode* wallNode;
