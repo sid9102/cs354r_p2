@@ -324,6 +324,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		index = engine->checkCollide();
 		if (index >= 0) {
 			//blocks.at(index) = NULL;
+			//mSceneMgr->destroyEntity(blocks.at(index)->blockEntity);
+			blocks.at(index)->destroy();
 		}
 		TimeStepAccumulator = 0.0;
 	}

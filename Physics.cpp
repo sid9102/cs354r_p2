@@ -150,17 +150,6 @@ int Physics::checkCollide() {
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
 						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 200) + 100, (rand() % 40) - 20, (rand() % 40) - 20));
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
-					/*if (userIndex[obA->getUserPointer()] < 100 || userIndex[obB->getUserPointer()] < 100) {
-						if (userIndex[obA->getUserPointer()] < 100) {
-							blockShape.at(userIndex[obA->getUserPointer()]) = NULL;
-							blockRigidBody.at(userIndex[obA->getUserPointer()]) = NULL;
-							return userIndex[obA->getUserPointer()];
-						} else {
-							blockShape.at(userIndex[obB->getUserPointer()]) = NULL;
-							blockRigidBody.at(userIndex[obB->getUserPointer()]) = NULL;
-							return userIndex[obB->getUserPointer()];
-						}
-					}*/
 					if(userIndex[obA->getUserPointer()] < 100) {
 						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obA->getUserPointer()]));
 						return userIndex[obA->getUserPointer()];

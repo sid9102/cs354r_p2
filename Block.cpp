@@ -8,7 +8,7 @@ Block::Block() {
 	points = 1 ;
 	damage = 0;
 	powerup = none;
-	//buildBlock();
+	buildBlock();
 }
 
 Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
@@ -63,13 +63,14 @@ Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
 
 Ogre::Vector3 Block::getPos() {
 	return Ogre::Vector3(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
-}
+}*/
 
 void Block::destroy()
 {
+	blockManager->destroyEntity(blockEntity);
 }
 
-void Block::collision()
+/*void Block::collision()
 {
 	damage++;
 }*/

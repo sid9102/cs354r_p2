@@ -27,10 +27,10 @@ public:
 	void destroy();
 	//void collision();
 	int getID();
-private:
 	Ogre::SceneManager *blockManager;
 	Ogre::SceneNode* blockNode;
 	Ogre::Entity* blockEntity;
+private:
 	void buildBlock();
 };
 
