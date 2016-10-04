@@ -24,7 +24,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// Create blocks
 	len = blocks.size();
 	for (int i = 0; i < len; i++)
-		blockShape.push_back(new btBoxShape(btVector3(5, 2, 2)));
+		blockShape.push_back(new btBoxShape(btVector3(250, 100, 100)));
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
@@ -149,8 +149,8 @@ int Physics::checkCollide() {
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
 						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 200) + 100, (rand() % 40) - 20, (rand() % 40) - 20));
-				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 100) {
-					if (userIndex[obA->getUserPointer()] < 100 || userIndex[obB->getUserPointer()] < 100) {
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
+					/*if (userIndex[obA->getUserPointer()] < 100 || userIndex[obB->getUserPointer()] < 100) {
 						if (userIndex[obA->getUserPointer()] < 100) {
 							blockShape.at(userIndex[obA->getUserPointer()]) = NULL;
 							blockRigidBody.at(userIndex[obA->getUserPointer()]) = NULL;
@@ -160,6 +160,14 @@ int Physics::checkCollide() {
 							blockRigidBody.at(userIndex[obB->getUserPointer()]) = NULL;
 							return userIndex[obB->getUserPointer()];
 						}
+					}*/
+					if(userIndex[obA->getUserPointer()] < 100) {
+						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obA->getUserPointer()]));
+						return userIndex[obA->getUserPointer()];
+					}
+					else if(userIndex[obB->getUserPointer()] < 100) {
+						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obB->getUserPointer()]));
+						return userIndex[obB->getUserPointer()];
 					}
 				}
 			}

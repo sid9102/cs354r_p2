@@ -61,7 +61,7 @@ void TutorialApplication::createScene(void)
 
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
 	balls.push_back(new Sphere(mSceneMgr));
-	blocks.push_back(new Block(mSceneMgr, Block::wood, 1));
+	blocks.push_back(new Block(mSceneMgr, Block::paper, 1));
 	engine = new Physics(balls, blocks, emptyRoom);
 
 	/*

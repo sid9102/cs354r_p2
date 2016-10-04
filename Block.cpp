@@ -2,51 +2,62 @@
 #include "Block.h"
 
 Block::Block() {
-	t = paper;
+	id=1;
+	type = paper;
 	durability = 1;
 	points = 1 ;
 	damage = 0;
 	powerup = none;
-	buildBlock();
+	//buildBlock();
 }
 
 Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
-	Type type = t;
+	id = num;
+	type = t;
 	switch(type)
 	{
 		case(paper):
 		{
 			durability = 1;
-			points = 1 ;
+			points = 1;
+			break;
 		}
 		case(wood):
 		{
 			durability = 2;
 			points = 2;
+			break;
 		}
 		case(stone):
 		{
 			durability = 3;
 			points = 3;
+			break;
 		}
 		case(brick):
 		{
 			durability = 4;
 			points = 4;
+			break;
 		}
 		case(metal):
 		{
 			durability = 1000;
 			points = 0;
+			break;
 		}
 	}
+
+	durability = 1;
+	points = 1;
+
 	damage = 0;
 	powerup = none;
 	blockManager = newManager;
 	buildBlock();
 }
 
-void Block::setPos(int x, int y, int z) {
+/*void Block::setPos(int x, int y, int z) {
 	blockNode->setPosition(x, y, z);
 }
 
@@ -61,7 +72,7 @@ void Block::destroy()
 void Block::collision()
 {
 	damage++;
-}
+}*/
 
 int Block::getID()
 {
@@ -71,32 +82,38 @@ int Block::getID()
 
 void Block::buildBlock() {
 	blockNode = blockManager->getRootSceneNode()->createChildSceneNode();
-	switch(t)
+	switch(type)
 	{
 		case(paper):
 		{
-			blockEntity = blockManager->createEntity("paperBlock"+getID(), "paper.mesh");
+			blockEntity = blockManager->createEntity("paperBlock"+getID(), "Paper.mesh");
+			break;
 		}
 		case(wood):
 		{
-			blockEntity = blockManager->createEntity("woodBlock"+getID(), "wood.mesh");
-			blockNode->attachObject(blockEntity);
+			blockEntity = blockManager->createEntity("woodBlock"+getID(), "Wood.mesh");
+			break;
 		}
 		case(stone):
 		{
-			blockEntity = blockManager->createEntity("stoneBlock"+getID(), "stone.mesh");
+			blockEntity = blockManager->createEntity("stoneBlock"+getID(), "Stone.mesh");
+			break;
 		}
 		case(brick):
 		{
-			blockEntity = blockManager->createEntity("brickBlock"+getID(), "brick.mesh");
+			blockEntity = blockManager->createEntity("brickBlock"+getID(), "Brick.mesh");
+			break;
 		}
 		case(metal):
 		{
-			blockEntity = blockManager->createEntity("metalBlock"+getID(), "metal.mesh");
+			blockEntity = blockManager->createEntity("metalBlock"+getID(), "Metal.mesh");
+			break;
 		}
 	}
-	blockNode->setPosition(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
 	
+
+	blockNode->setPosition(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
+	blockNode->setScale(Ogre::Vector3(100,100,100));
 	blockEntity->setCastShadows(true);
 	blockNode->attachObject(blockEntity);
-} 
+}

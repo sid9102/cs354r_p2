@@ -322,8 +322,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	if (TimeStepAccumulator >= TimeStep) {
 		engine->update();
 		index = engine->checkCollide();
-		if (index > 0) {
-			blocks.at(index) = NULL;
+		if (index >= 0) {
+			//blocks.at(index) = NULL;
 		}
 		TimeStepAccumulator = 0.0;
 	}
