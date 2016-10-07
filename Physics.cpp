@@ -215,6 +215,6 @@ Physics::~Physics() {
 		delete blockRigidBody.at(k);
 	}
 
-	delete ballInertia;
-	delete blockInertia;
+//	delete ballInertia;
+//	delete blockInertia;
 }
