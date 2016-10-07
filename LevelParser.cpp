@@ -40,16 +40,16 @@
  * pooop
  * ppppp
  */
-string level[] = {"wwwww\nwbbbw\nwbmbw\nsbbbs\nsssss",
+std::string level[] = {"wwwww\nwbbbw\nwbmbw\nsbbbs\nsssss",
                   "wwwww\nwbbbw\nwbmbw\nwbbbw\nsssss",
                   "wwwww\nwsssw\npsmsp\npsssp\nppppp",
                   "wwwww\npwwwp\npwmwp\npbbbp\nppppp",
                   "wwwww\npooop\npooop\npooop\nppppp"};
 
-static void parseLevel(vector<Block*> blocks, Ogre::SceneManager *curManager)
+static void parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
 {
     int id = 1;
-    for(string layer : level)
+    for(std::string layer : level)
     {
         for(char& c : layer)
         {
