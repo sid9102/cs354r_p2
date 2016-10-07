@@ -309,27 +309,30 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		}
 	}
 	*/
+
 	btTransform trans;
 	int len = balls.size();
 	int index;
+
 	for (int i = 0; i < len; i++) {
 		engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
 		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
 		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
 	}
-
-	TimeStepAccumulator += TimeStep;
-	if (TimeStepAccumulator >= TimeStep) {
-		engine->update();
-		index = engine->checkCollide();
-		if (index >= 0) {
-			//blocks.at(index) = NULL;
-			//mSceneMgr->destroyEntity(blocks.at(index)->blockEntity);
-			blocks.at(index)->destroy();
-		}
-		TimeStepAccumulator = 0.0;
+	engine->update(dt, 1000);
+	index = engine->checkCollide();
+	if (index >= 0) {
+		blocks.at(index)->destroy();
 	}
+	/*/
+	newTime = time(0);
+	frameTime = newTime - currentTime;
+	currentTime = time(0);
 
+	while (frameTime >= 0) {
+
+		frameTime -= dt;
+	}*/
 	//ball->update();
 	//emptyRoom->checkCollide(ball);
     return true;

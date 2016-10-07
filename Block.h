@@ -3,6 +3,7 @@
 #define __Block_h_
 #include <OgreEntity.h>
 #include <OgreSceneNode.h>
+#include <Ogre.h>
 #include <OgreSceneManager.h>
 
 class Block
@@ -17,6 +18,9 @@ public:
 	int durability;
 	int points;
 	int damage;
+	double height;
+	double length;
+	double width;
 	Powerup powerup;
 
 	Block();
@@ -30,6 +34,9 @@ public:
 	Ogre::SceneManager *blockManager;
 	Ogre::SceneNode* blockNode;
 	Ogre::Entity* blockEntity;
+	void setPosition(int x, int y, int z);
+	Ogre::Vector3 getPosition();
+	void setSize(double x, double y, double z);
 private:
 	void buildBlock();
 };

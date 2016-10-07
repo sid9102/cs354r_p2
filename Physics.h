@@ -13,17 +13,18 @@
 class Physics
 {
 public:
-	std::map<void*, int> userIndex;
-	Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space);
+	// Public Members
+	std::map<void*, int>		userIndex;		// Map holds the index of all objects
+	std::vector<btRigidBody*>	ballRigidBody;	// Holds the pointer to the physics objects for ball
+	std::vector<btRigidBody*>	blockRigidBody; // Holds the pointer to the physics objects for block
+
+	// Constructor and deconstructor declared here
+	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space);
 	~Physics();
-	std::vector<btRigidBody*> ballRigidBody;
-	std::vector<btRigidBody*> blockRigidBody;
-	int checkCollide();
-	void update();
+
+	int checkCollide();							// Check for collisions between specific objects
+	void update(double tStep, double rate);		// Update the simulation (simulation step)
 private:
-	// Timer for physics engine
-
-
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;
 	btDefaultCollisionConfiguration* collisionConfiguration;
@@ -31,24 +32,28 @@ private:
 	btSequentialImpulseConstraintSolver* solver;
 	btDiscreteDynamicsWorld* dynamicsWorld;
 
-	// Dynamic Objects
+	// Dynamic Objects (blocks, balls, powerups, etc.)
 	std::vector<btCollisionShape*> ballShape; // mass = 1
 	std::vector<btCollisionShape*> blockShape; // mass = 0;
 
-	// Static Objects
+	// Static Objects (walls, ceiling, floor)
 	btCollisionShape* groundShape;
-	btDefaultMotionState* groundMotionState;
-	btRigidBody* groundRigidBody;
 	std::vector<btCollisionShape*> wallShape;
-	std::vector<btDefaultMotionState*> wallMotionState;
-	std::vector<btRigidBody*> wallRigidBody;
 	btCollisionShape* ceilShape;
-	btDefaultMotionState* ceilMotionState;
-	btRigidBody* ceilRigidBody;
+
+	// Motion states for objects
 	std::vector<btDefaultMotionState*> ballMotionState;
 	std::vector<btDefaultMotionState*> blockMotionState;
+	btDefaultMotionState* groundMotionState;
+	std::vector<btDefaultMotionState*> wallMotionState;
+	btDefaultMotionState* ceilMotionState;
 
-	// SetUp Ball Object
+	// Rigid bodies (the physical objects that interact with each other in the world)
+	btRigidBody* groundRigidBody;
+	std::vector<btRigidBody*> wallRigidBody;
+	btRigidBody* ceilRigidBody;
+
+	// SetUp Dynamic Objects
 	btScalar ballMass;
 	btScalar blockMass;
 	btVector3 ballInertia;
