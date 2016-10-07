@@ -126,6 +126,7 @@ protected:
     Ogre::RenderWindow*         mWindow;
     Ogre::String                mResourcesCfg;
     Ogre::String                mPluginsCfg;
+    Ogre::Vector3*              paddleCoords;
 
     Ogre::OverlaySystem*        mOverlaySystem;
 
@@ -141,7 +142,6 @@ protected:
     OIS::InputManager*          mInputManager;
     OIS::Mouse*                 mMouse;
     OIS::Keyboard*              mKeyboard;
-
     // Added for Mac compatibility
     Ogre::String                 m_ResourcePath;
 

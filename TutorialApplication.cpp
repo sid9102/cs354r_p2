@@ -63,7 +63,6 @@ void TutorialApplication::createScene(void)
     paddleNode->attachObject(paddle);
     paddleNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90));
     paddleNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90));
-    paddleNode->setPosition(-500, 250, 0);
     paddleNode->setScale(40, 40, 40);
 
 	balls.push_back(new Sphere(mSceneMgr));

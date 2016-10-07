@@ -98,6 +98,7 @@ void BaseApplication::createCamera(void)
     // Look back along -Z
     mCamera->lookAt(Ogre::Vector3(1500,250,0));
     mCamera->setNearClipDistance(5);
+    paddleCoords = new Ogre::Vector3(-200, 250, 0);
 
     mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller
 }
@@ -335,6 +336,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}*/
 	//ball->update();
 	//emptyRoom->checkCollide(ball);
+
+    Ogre::SceneNode* paddleNode = mSceneMgr->getSceneNode("paddleNode");
+    paddleNode->setPosition(paddleCoords->x, paddleCoords->y, paddleCoords->z);
     return true;
 }
 //---------------------------------------------------------------------------
@@ -441,7 +445,30 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
     if (mTrayMgr->injectMouseMove(arg)) return true;
-    mCameraMan->injectMouseMove(arg);
+//    mCameraMan->injectMouseMove(arg);
+
+    float xDiff = arg.state.X.rel;
+    float yDiff = arg.state.Y.rel;
+    paddleCoords->z += xDiff;
+    paddleCoords->y -= yDiff;
+    if (paddleCoords->z > 250)
+    {
+        paddleCoords->z = 250;
+    }
+    else if(paddleCoords->z < -250)
+    {
+        paddleCoords->z = -250;
+    }
+
+    if(paddleCoords->y > 500)
+    {
+        paddleCoords->y = 500;
+    }
+    else if(paddleCoords->y < 0)
+    {
+        paddleCoords->y = 0;
+    }
+    printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
 }
 //---------------------------------------------------------------------------
