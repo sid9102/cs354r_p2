@@ -87,9 +87,11 @@ public:
 	std::vector<Sphere*> balls;
 	std::vector<Block*> blocks;
 	Physics* engine;
-	double timeSinceLastFrame = 0;
-	double TimeStep = 1 / 60.0;
-	double TimeStepAccumulator = 0.0;
+	double currentTime = time(0);
+	double newTime = 0.0;
+	double t = 0.0;
+	double dt = 1 / 60.0;
+	double frameTime = 0.0;
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
 protected:

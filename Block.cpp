@@ -67,7 +67,7 @@ Ogre::Vector3 Block::getPos() {
 
 void Block::destroy()
 {
-	blockManager->destroyEntity(blockEntity);
+	blockEntity->setVisible(false);
 }
 
 /*void Block::collision()
@@ -114,7 +114,19 @@ void Block::buildBlock() {
 	
 
 	blockNode->setPosition(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
-	blockNode->setScale(Ogre::Vector3(100,100,100));
 	blockEntity->setCastShadows(true);
 	blockNode->attachObject(blockEntity);
+}
+
+void Block::setPosition(int x, int y, int z) {
+	blockNode->setPosition(Ogre::Vector3(x, y, z));
+}
+void Block::setSize(double x, double y, double z) {
+	width = x;
+	length = y;
+	height = z;
+	blockNode->setScale(Ogre::Vector3((width / 250.0) * 100.0, (length / 100.0) * 100.0, (height / 100.0) * 100.0));
+}
+Ogre::Vector3 Block::getPosition() {
+	return blockNode->getPosition();
 }

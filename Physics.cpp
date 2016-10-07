@@ -16,7 +16,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	//Gravity set here, we need very light gravity (towards the paddle?)
 	dynamicsWorld->setGravity(btVector3(-10, 0, 0));
 
-	// The physics object representing our ball
+	// The physics object(s) representing our ball(s)
 	int len = balls.size();
 	for(int i = 0; i < len; i++)
 		ballShape.push_back(new btSphereShape(balls.at(i)->radius));
@@ -24,7 +24,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// Create blocks
 	len = blocks.size();
 	for (int i = 0; i < len; i++)
-		blockShape.push_back(new btBoxShape(btVector3(250, 100, 100)));
+		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width, blocks.at(i)->length, blocks.at(i)->height)));
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
@@ -42,7 +42,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	wallMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))));
 	ceilMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
 
-	// Handle collision between the ball and the ground
+	// Handle collision between the ball and the ground, walls, and ceiling
 	btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(0, groundMotionState, groundShape, btVector3(0, 0, 0));
 	btRigidBody::btRigidBodyConstructionInfo wallRigidBodyCI(0, wallMotionState.at(0), wallShape.at(0), btVector3(0, 0, 0));
 	btRigidBody::btRigidBodyConstructionInfo wallRigidBodyCI2(0, wallMotionState.at(1), wallShape.at(1), btVector3(0, 0, 0));
@@ -65,10 +65,9 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	for (int i = 0; i < 4; i++) {
 		wallRigidBody.at(i)->setFriction(1.0);
 		wallRigidBody.at(i)->setRollingFriction(1.0);
-		wallRigidBody.at(i)->setRestitution(0);
+		wallRigidBody.at(i)->setRestitution(1.0);
 		dynamicsWorld->addRigidBody(wallRigidBody.at(i));
 	}
-	wallRigidBody.at(1)->setRestitution(1.0);
 	wallRigidBody.at(0)->setUserPointer(wallRigidBody.at(0));
 	wallRigidBody.at(1)->setUserPointer(wallRigidBody.at(1));
 	wallRigidBody.at(2)->setUserPointer(wallRigidBody.at(2));
@@ -116,7 +115,9 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	len = blocks.size();
 	for (int j = 0; j < len; j++) {
 		blockShape.at(j)->calculateLocalInertia(blockMass, blockInertia);
-		blockMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0))));
+		blockMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(blocks.at(j)->getPosition().x, 
+																											blocks.at(j)->getPosition().y, 
+																											blocks.at(j)->getPosition().z))));
 		btRigidBody::btRigidBodyConstructionInfo blockRigidBodyCI(blockMass, blockMotionState.at(j), blockShape.at(j), blockInertia);
 		blockRigidBody.push_back(new btRigidBody(blockRigidBodyCI));
 
@@ -124,7 +125,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 		userIndex[blockRigidBody.at(j)->getUserPointer()] = j;
 		blockRigidBody.at(j)->setFriction(1.0);
 		blockRigidBody.at(j)->setRollingFriction(1.0);
-		blockRigidBody.at(j)->setRestitution(1.0);
+		blockRigidBody.at(j)->setRestitution(2.0);
 		dynamicsWorld->addRigidBody(blockRigidBody.at(j));
 	}
 }
@@ -144,19 +145,23 @@ int Physics::checkCollide() {
 		for (int j = 0; j < numContacts; j++)
 		{
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
-			if ((pt.getDistance() <= 0 + 0.0001) || (pt.getDistance() <= 0 - 0.0001))
+			if (pt.getDistance() <= 0)
 			{
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
-						ballRigidBody.at(0)->setLinearVelocity(btVector3((rand() % 200) + 100, (rand() % 40) - 20, (rand() % 40) - 20));
+						ballRigidBody.at(0)->setLinearVelocity(btVector3(300, -40, (rand() % 40) - 20));
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
-					if(userIndex[obA->getUserPointer()] < 100) {
+					if((userIndex[obA->getUserPointer()] < 100) && (userIndex[obA->getUserPointer()] >= 0)) {
+						int index = userIndex[obA->getUserPointer()];
 						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obA->getUserPointer()]));
-						return userIndex[obA->getUserPointer()];
+						index = userIndex[obA->getUserPointer()] = 1;
+						return index;
 					}
-					else if(userIndex[obB->getUserPointer()] < 100) {
+					else if((userIndex[obB->getUserPointer()] < 100) && (userIndex[obB->getUserPointer()] >= 0)) {
+						int index = userIndex[obB->getUserPointer()];
 						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obB->getUserPointer()]));
-						return userIndex[obB->getUserPointer()];
+						userIndex[obB->getUserPointer()] = -1;
+						return index;
 					}
 				}
 			}
@@ -165,15 +170,51 @@ int Physics::checkCollide() {
 	return -1;
 }
 
-void Physics::update() {
-	dynamicsWorld->stepSimulation(1 / 60.f, 10);
+void Physics::update(double tStep, double rate) {
+	dynamicsWorld->stepSimulation(tStep, rate);
 }
 
 Physics::~Physics() {
-	// Clean up once the simulation ends
-	delete dynamicsWorld;
-	delete solver;
-	delete dispatcher;
-	delete collisionConfiguration;
+	int len;
 	delete broadphase;
+	
+	for (std::map<void*, int>::iterator i; i != userIndex.cend(); i++) {
+		userIndex.erase(i);
+	}
+	
+	delete collisionConfiguration;
+	delete dispatcher;
+	delete solver;
+	delete dynamicsWorld;
+	len = ballShape.size();
+	for (int i = 0; i < len; i++) {
+		delete ballShape.at(i);
+		delete ballMotionState.at(i);
+		delete ballRigidBody.at(i);
+	}
+
+	delete groundShape;
+	delete groundMotionState;
+	delete groundRigidBody;
+
+	delete ceilShape;
+	delete ceilMotionState;
+	delete ceilRigidBody;
+
+	len = wallShape.size();
+	for (int j = 0; j < len; j++) {
+		delete wallShape.at(j);
+		delete wallMotionState.at(j);
+		delete wallRigidBody.at(j);
+	}
+
+	len = blockShape.size();
+	for (int k = 0; k < len; k++) {
+		delete blockShape.at(k);
+		delete blockMotionState.at(k);
+		delete blockRigidBody.at(k);
+	}
+
+	delete ballInertia;
+	delete blockInertia;
 }

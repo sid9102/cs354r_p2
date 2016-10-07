@@ -17,10 +17,6 @@ http://www.ogre3d.org/wiki/
 
 #include "TutorialApplication.h"
 #include <iostream>
-#include <chrono>
-#include <thread>
-#include <atomic>
-#include <mutex>
 #include <string>
 #define ROOM_DIM 1000
 
@@ -62,16 +58,10 @@ void TutorialApplication::createScene(void)
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
 	balls.push_back(new Sphere(mSceneMgr));
 	blocks.push_back(new Block(mSceneMgr, Block::paper, 1));
+	blocks.at(0)->setPosition(400, 200, 0);
+	blocks.at(0)->setSize(50, 20, 20);
 	engine = new Physics(balls, blocks, emptyRoom);
 
-	/*
-	srand(time(NULL));
-	for (int i = 0; i < NUM_SPHERE; i++) {
-		ball[i] = new Sphere(10 + (rand() % 30), mSceneMgr);
-		ball[i]->setPos(i * 60 + 10, 100, 0);
-		ball[i]->setVel(rand() % 2, rand() % 2, rand() % 2);
-	}
-	*/
 }
 
 //---------------------------------------------------------------------------
