@@ -85,6 +85,7 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
+    Ogre::Entity* paddle;
 	std::vector<Block*> blocks;
 	Physics* engine;
 	double currentTime = time(0);

@@ -18,6 +18,8 @@ http://www.ogre3d.org/wiki/
 #include "TutorialApplication.h"
 #include <iostream>
 #include <string>
+#include <OgreVector3.h>
+#include <OgreVector3.h>
 #define ROOM_DIM 1000
 
 //---------------------------------------------------------------------------
@@ -56,6 +58,14 @@ void TutorialApplication::createScene(void)
 	directionalLight->setDirection(Ogre::Vector3(0, -1, 1));
 
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
+    Ogre::SceneNode* paddleNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("paddleNode");
+    paddle = mSceneMgr->createEntity("Paddle.mesh");
+    paddleNode->attachObject(paddle);
+    paddleNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90));
+    paddleNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90));
+    paddleNode->setPosition(-500, 250, 0);
+    paddleNode->setScale(40, 40, 40);
+
 	balls.push_back(new Sphere(mSceneMgr));
 	blocks.push_back(new Block(mSceneMgr, Block::paper, 1));
 	blocks.at(0)->setPosition(400, 200, 0);
