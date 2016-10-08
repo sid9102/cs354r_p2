@@ -98,7 +98,6 @@ void BaseApplication::createCamera(void)
     // Look back along -Z
     mCamera->lookAt(Ogre::Vector3(1500,250,0));
     mCamera->setNearClipDistance(5);
-    paddleCoords = new Ogre::Vector3(-200, 250, 0);
 
     mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller
 }
@@ -322,8 +321,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}
 	engine->update(dt, 1000);
 	index = engine->checkCollide();
-	if (index >= 0) {
-		blocks.at(index)->destroy();
+	if (index > 0) {
+		blocks.at(index-1)->destroy();
 	}
 	/*/
 	newTime = time(0);
@@ -336,9 +335,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}*/
 	//ball->update();
 	//emptyRoom->checkCollide(ball);
-
-    Ogre::SceneNode* paddleNode = mSceneMgr->getSceneNode("paddleNode");
-    paddleNode->setPosition(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+    
     return true;
 }
 //---------------------------------------------------------------------------
@@ -444,9 +441,9 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
+	Ogre::Vector3* paddleCoords = &paddle->position;
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
-
     float xDiff = arg.state.X.rel;
     float yDiff = arg.state.Y.rel;
     paddleCoords->z += xDiff;
@@ -468,6 +465,9 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     {
         paddleCoords->y = 0;
     }
+
+	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+	engine->updatePaddle(paddle);
     printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
 }
@@ -492,6 +492,7 @@ void BaseApplication::windowResized(Ogre::RenderWindow* rw)
     unsigned int width, height, depth;
     int left, top;
     rw->getMetrics(width, height, depth, left, top);
+	rw->setFullscreen(false, 800, 600);
 
     const OIS::MouseState &ms = mMouse->getMouseState();
     ms.width = width;

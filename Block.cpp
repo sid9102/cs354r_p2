@@ -126,6 +126,7 @@ void Block::setSize(double x, double y, double z) {
 	length = y;
 	height = z;
 	blockNode->setScale(Ogre::Vector3((width / 250.0) * 100.0, (length / 100.0) * 100.0, (height / 100.0) * 100.0));
+	blockNode->rotate(Ogre::Quaternion(Ogre::Radian(PI/2), Ogre::Vector3(0, 1, 0)));
 }
 Ogre::Vector3 Block::getPosition() {
 	return blockNode->getPosition();

@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space) {
+Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad) {
 	// Helps eliminate pairs of object that should not collide
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -24,7 +24,9 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// Create blocks
 	len = blocks.size();
 	for (int i = 0; i < len; i++)
-		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width, blocks.at(i)->length, blocks.at(i)->height)));
+		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->length, blocks.at(i)->width, blocks.at(i)->height)));
+
+	paddleShape = new btCylinderShape(btVector3(10, pad->dim.x * 2.0, pad->dim.x * 2.0));
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
@@ -50,6 +52,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	btRigidBody::btRigidBodyConstructionInfo wallRigidBodyCI4(0, wallMotionState.at(3), wallShape.at(3), btVector3(0, 0, 0));
 	btRigidBody::btRigidBodyConstructionInfo ceilRigidBodyCI(0, ceilMotionState, ceilShape, btVector3(0, 0, 0));
 
+	// Setu up the properties of the ground
 	groundRigidBody = new btRigidBody(groundRigidBodyCI);
 	groundRigidBody->setFriction(1.0);
 	groundRigidBody->setRollingFriction(1.0);
@@ -58,6 +61,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	userIndex[groundRigidBody->getUserPointer()] == 5500;
 	dynamicsWorld->addRigidBody(groundRigidBody);
 
+	// Set up the properties of the walls
 	wallRigidBody.push_back(new btRigidBody(wallRigidBodyCI));
 	wallRigidBody.push_back(new btRigidBody(wallRigidBodyCI2));
 	wallRigidBody.push_back(new btRigidBody(wallRigidBodyCI3));
@@ -77,6 +81,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	userIndex[wallRigidBody.at(2)->getUserPointer()] = 3500;
 	userIndex[wallRigidBody.at(3)->getUserPointer()] = 4500;
 
+	// Set up the properties of the ceiling
 	ceilRigidBody = new btRigidBody(ceilRigidBodyCI);
 	ceilRigidBody->setFriction(1.0);
 	ceilRigidBody->setRollingFriction(1.0);
@@ -89,16 +94,15 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// NOTE: The btVector 3 here is the starting position for the ball
 	ballMass = 1;
 	blockMass = 0;
+	paddleMass = 0;
 	ballInertia = btVector3(0, 0, 0);
 	blockInertia = btVector3(0, 0, 0);
+	paddleInertia = btVector3(0, 0, 0);
 
 	len = balls.size();
 	for (int j = 0; j < len; j++) {
 		ballMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 400, 0))));
-
 		ballShape.at(j)->calculateLocalInertia(ballMass, ballInertia);
-
-
 		btRigidBody::btRigidBodyConstructionInfo physBallRigidBodyCI(ballMass, ballMotionState.at(j), ballShape.at(j), ballInertia);
 		ballRigidBody.push_back(new btRigidBody(physBallRigidBodyCI));
 
@@ -112,6 +116,18 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 		dynamicsWorld->addRigidBody(ballRigidBody.at(j));
 	}
 	
+	//Set properties for Paddle
+	paddleMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y, pad->position.z)));
+	paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
+	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI(paddleMass, paddleMotionState, paddleShape, paddleInertia);
+	paddleRigidBody = new btRigidBody(paddleRigidBodyCI);
+	paddleRigidBody->setUserPointer(paddleShape);
+	userIndex[paddleRigidBody->getUserPointer()] = 8000;
+	paddleRigidBody->setRestitution(2.0);
+	paddleRigidBody->setFriction(1.0);
+	paddleRigidBody->setRollingFriction(1.0);
+	dynamicsWorld->addRigidBody(paddleRigidBody);
+
 	len = blocks.size();
 	for (int j = 0; j < len; j++) {
 		blockShape.at(j)->calculateLocalInertia(blockMass, blockInertia);
@@ -122,7 +138,8 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 		blockRigidBody.push_back(new btRigidBody(blockRigidBodyCI));
 
 		blockRigidBody.at(j)->setUserPointer(blockRigidBody.at(j));
-		userIndex[blockRigidBody.at(j)->getUserPointer()] = j;
+		userIndex[blockRigidBody.at(j)->getUserPointer()] = j+1;
+		paddleRigidBody->setUserPointer(paddleShape);
 		blockRigidBody.at(j)->setFriction(1.0);
 		blockRigidBody.at(j)->setRollingFriction(1.0);
 		blockRigidBody.at(j)->setRestitution(2.0);
@@ -151,17 +168,24 @@ int Physics::checkCollide() {
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
 						ballRigidBody.at(0)->setLinearVelocity(btVector3(300, -40, (rand() % 40) - 20));
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
-					if((userIndex[obA->getUserPointer()] < 100) && (userIndex[obA->getUserPointer()] >= 0)) {
+					if((userIndex[obA->getUserPointer()] < MAX_BLOCKS) && (userIndex[obA->getUserPointer()] >= 0)) {
 						int index = userIndex[obA->getUserPointer()];
-						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obA->getUserPointer()]));
-						index = userIndex[obA->getUserPointer()] = 1;
+						userIndex[obA->getUserPointer()] = -1;
+						if ((index - 1) >= 0) {
+							dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+						}
 						return index;
 					}
-					else if((userIndex[obB->getUserPointer()] < 100) && (userIndex[obB->getUserPointer()] >= 0)) {
+					else if((userIndex[obB->getUserPointer()] < MAX_BLOCKS) && (userIndex[obB->getUserPointer()] >= 0)) {
 						int index = userIndex[obB->getUserPointer()];
-						dynamicsWorld->removeCollisionObject(blockRigidBody.at(userIndex[obB->getUserPointer()]));
 						userIndex[obB->getUserPointer()] = -1;
+						if ((index - 1) >= 0) {
+							dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+						}
 						return index;
+					}
+					else if (userIndex[obA->getUserPointer()] == 8000 || userIndex[obA->getUserPointer()] == 8000) {
+						ballRigidBody.at(0)->setLinearVelocity(btVector3(300, -40, (rand() % 40) - 20));
 					}
 				}
 			}
@@ -174,6 +198,17 @@ void Physics::update(double tStep, double rate) {
 	dynamicsWorld->stepSimulation(tStep, rate);
 }
 
+void Physics::updatePaddle(Paddle* &pad) {
+	dynamicsWorld->removeRigidBody(paddleRigidBody);
+	paddleMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y, pad->position.z+5)));
+	paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
+	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI(paddleMass, paddleMotionState, paddleShape, paddleInertia);
+	paddleRigidBody = new btRigidBody(paddleRigidBodyCI);
+	paddleRigidBody->setRestitution(2.0);
+	paddleRigidBody->setFriction(1.0);
+	paddleRigidBody->setRollingFriction(1.0);
+	dynamicsWorld->addRigidBody(paddleRigidBody);
+}
 Physics::~Physics() {
 	int len;
 	delete broadphase;

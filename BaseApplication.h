@@ -49,6 +49,7 @@ http://www.ogre3d.org/wiki/
 #include "Sphere.h"
 #include "Block.h"
 #include "Room.h"
+#include "Paddle.h"
 #include "Physics.h"
 
 #ifdef OGRE_STATIC_LIB
@@ -74,7 +75,6 @@ http://www.ogre3d.org/wiki/
 
 //---------------------------------------------------------------------------
 
-#define NUM_SPHERE 5
 class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
 {
 public:
@@ -85,9 +85,9 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
-    Ogre::Entity* paddle;
 	std::vector<Block*> blocks;
 	Physics* engine;
+	Paddle* paddle;
 	double currentTime = time(0);
 	double newTime = 0.0;
 	double t = 0.0;
@@ -126,7 +126,6 @@ protected:
     Ogre::RenderWindow*         mWindow;
     Ogre::String                mResourcesCfg;
     Ogre::String                mPluginsCfg;
-    Ogre::Vector3*              paddleCoords;
 
     Ogre::OverlaySystem*        mOverlaySystem;
 

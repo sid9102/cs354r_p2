@@ -58,18 +58,13 @@ void TutorialApplication::createScene(void)
 	directionalLight->setDirection(Ogre::Vector3(0, -1, 1));
 
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
-    Ogre::SceneNode* paddleNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("paddleNode");
-    paddle = mSceneMgr->createEntity("Paddle.mesh");
-    paddleNode->attachObject(paddle);
-    paddleNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90));
-    paddleNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90));
-    paddleNode->setScale(40, 40, 40);
+	paddle = new Paddle(mSceneMgr, Ogre::Vector3(-200, 250, 0));
 
-	balls.push_back(new Sphere(mSceneMgr));
+	balls.push_back(new Sphere(25, mSceneMgr));
 	blocks.push_back(new Block(mSceneMgr, Block::paper, 1));
 	blocks.at(0)->setPosition(400, 200, 0);
 	blocks.at(0)->setSize(50, 20, 20);
-	engine = new Physics(balls, blocks, emptyRoom);
+	engine = new Physics(balls, blocks, emptyRoom, paddle);
 
 }
 

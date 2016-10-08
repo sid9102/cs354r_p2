@@ -10,6 +10,9 @@
 #include "Room.h"
 #include "Timer.h"
 #include "Block.h"
+#include "Paddle.h"
+
+#define MAX_BLOCKS 999
 class Physics
 {
 public:
@@ -17,13 +20,15 @@ public:
 	std::map<void*, int>		userIndex;		// Map holds the index of all objects
 	std::vector<btRigidBody*>	ballRigidBody;	// Holds the pointer to the physics objects for ball
 	std::vector<btRigidBody*>	blockRigidBody; // Holds the pointer to the physics objects for block
+	btRigidBody*				paddleRigidBody;// Holds the pointer to the hit area for the paddle
 
 	// Constructor and deconstructor declared here
-	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space);
+	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad);
 	~Physics();
 
 	int checkCollide();							// Check for collisions between specific objects
 	void update(double tStep, double rate);		// Update the simulation (simulation step)
+	void updatePaddle(Paddle* &pad);			// Update position of the paddle's hit area to match the paddle graphic
 private:
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;
@@ -35,6 +40,7 @@ private:
 	// Dynamic Objects (blocks, balls, powerups, etc.)
 	std::vector<btCollisionShape*> ballShape; // mass = 1
 	std::vector<btCollisionShape*> blockShape; // mass = 0;
+	btCollisionShape*			   paddleShape; // mass = 0;
 
 	// Static Objects (walls, ceiling, floor)
 	btCollisionShape* groundShape;
@@ -47,6 +53,7 @@ private:
 	btDefaultMotionState* groundMotionState;
 	std::vector<btDefaultMotionState*> wallMotionState;
 	btDefaultMotionState* ceilMotionState;
+	btDefaultMotionState* paddleMotionState;
 
 	// Rigid bodies (the physical objects that interact with each other in the world)
 	btRigidBody* groundRigidBody;
@@ -56,7 +63,9 @@ private:
 	// SetUp Dynamic Objects
 	btScalar ballMass;
 	btScalar blockMass;
+	btScalar paddleMass;
 	btVector3 ballInertia;
 	btVector3 blockInertia;
+	btVector3 paddleInertia;
 };
 #endif // #ifndef __Physics_h_

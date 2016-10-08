@@ -5,7 +5,7 @@
 #include <OgreSceneNode.h>
 #include <Ogre.h>
 #include <OgreSceneManager.h>
-
+#define PI 3.1415926535898
 class Block
 {
 
