@@ -52,7 +52,7 @@ void Sphere::buildSphere() {
 	ballEntity = sphereManager->createEntity("ball"+numBall, Ogre::SceneManager::PT_SPHERE);
 	ballNode->setPosition(ballNode->getPosition().x, 100, ballNode->getPosition().z);
 	ballNode->setScale(Ogre::Vector3((radius << 1) / 100.0, (radius << 1) / 100.0, (radius << 1) / 100.0));
-	ballEntity->setMaterialName("Custom/CDemon");
+	ballEntity->setMaterialName("Custom/MarBall");
 	ballEntity->setCastShadows(true);
 	ballNode->attachObject(ballEntity);
 	numBall++;

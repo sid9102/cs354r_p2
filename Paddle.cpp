@@ -4,11 +4,15 @@ Paddle::Paddle(Ogre::SceneManager *newManager) {
 	paddleManager = newManager;
 	dim = Ogre::Vector3(80, 12, 120);
 	position = Ogre::Vector3(0, 0, 0);
+	lPosition = Ogre::Vector3(0, 0, 0);
+	dV = Ogre::Vector3(0, 0, 0);
 	buildPaddle();
 }
 Paddle::Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos) {
 	paddleManager = newManager;
 	position = nPos;
+	lPosition = nPos;
+	dV = Ogre::Vector3(0, 0, 0);
 	dim = Ogre::Vector3(80, 12, 120);
 	buildPaddle();
 }

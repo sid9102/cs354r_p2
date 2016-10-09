@@ -1,4 +1,4 @@
-material Custom/Slime
+material Custom/Grid
  {
     technique
     {
@@ -6,23 +6,7 @@ material Custom/Slime
         {
           texture_unit
           {
-            texture slime.png
-            scale 2 2
-            // this means that the texture will be tiled 10 times (1/10 = 0.1)
-          }
-       }   
-    }
- }
- 
- material Custom/PBrick
- {
-    technique
-    {
-       pass
-        {
-          texture_unit
-          {
-            texture pbrick.jpg
+            texture grid.png
             scale 1 1
             // this means that the texture will be tiled 10 times (1/10 = 0.1)
           }
@@ -30,7 +14,7 @@ material Custom/Slime
     }
  }
  
-material Custom/CDemon
+material Custom/MarBall
 {
 	technique
 	{
@@ -38,14 +22,7 @@ material Custom/CDemon
 		{
 			texture_unit
 			{
-				texture CDemon.jpg
-			}
-
-			texture_unit
-			{
-				colour_op_ex add src_texture src_current
-				colour_op_multipass_fallback one one
-				env_map spherical
+				texture marball.png
 			}
 		}
 	}

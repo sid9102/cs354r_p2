@@ -65,7 +65,6 @@ void TutorialApplication::createScene(void)
 	blocks.at(0)->setPosition(400, 200, 0);
 	blocks.at(0)->setSize(50, 20, 20);
 	engine = new Physics(balls, blocks, emptyRoom, paddle);
-
 }
 
 //---------------------------------------------------------------------------

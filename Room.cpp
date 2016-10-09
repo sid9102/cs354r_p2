@@ -107,7 +107,7 @@ void Room::buildRoom() {
 	groundEntity = roomManager->createEntity("ground");
 	roomManager->getRootSceneNode()->createChildSceneNode()->attachObject(groundEntity);
 	groundEntity->setCastShadows(false);
-	groundEntity->setMaterialName("Custom/Slime");
+	groundEntity->setMaterialName("Custom/Grid");
 
 	// Create wall 1
 	Ogre::Plane plane2(Ogre::Vector3::UNIT_X, 0);
@@ -122,7 +122,7 @@ void Room::buildRoom() {
 	wallNode->attachObject(wallEntity);
 
 	wallEntity->setCastShadows(false);
-	wallEntity->setMaterialName("Custom/PBrick");
+	wallEntity->setMaterialName("Custom/Grid");
 
 	// Create wall 2
 	Ogre::Plane plane3(Ogre::Vector3::NEGATIVE_UNIT_X, 0);
@@ -138,7 +138,7 @@ void Room::buildRoom() {
 	wallNode2->attachObject(wallEntity2);
 
 	wallEntity2->setCastShadows(false);
-	wallEntity2->setMaterialName("Custom/PBrick");
+	wallEntity2->setMaterialName("Custom/Grid");
 
 	// Create wall 3
 	Ogre::Plane plane4(Ogre::Vector3::UNIT_Z, 0);
@@ -153,7 +153,7 @@ void Room::buildRoom() {
 	wallNode3->attachObject(wallEntity3);
 
 	wallEntity3->setCastShadows(false);
-	wallEntity3->setMaterialName("Custom/PBrick");
+	wallEntity3->setMaterialName("Custom/Grid");
 
 	// Create wall 4
 	Ogre::Plane plane5(Ogre::Vector3::NEGATIVE_UNIT_Z, 0);
@@ -168,7 +168,7 @@ void Room::buildRoom() {
 	wallNode4->attachObject(wallEntity4);
 
 	wallEntity4->setCastShadows(false);
-	wallEntity4->setMaterialName("Custom/PBrick");
+	wallEntity4->setMaterialName("Custom/Grid");
 
 
 	// Create roof
@@ -184,5 +184,5 @@ void Room::buildRoom() {
 	roofNode->attachObject(roofEntity);
 
 	roofEntity->setCastShadows(false);
-	roofEntity->setMaterialName("Custom/PBrick");
+	roofEntity->setMaterialName("Custom/Grid");
 }

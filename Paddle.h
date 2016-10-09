@@ -10,6 +10,8 @@ class Paddle
 {
 public:
 	Ogre::Vector3 position;
+	Ogre::Vector3 lPosition;
+	Ogre::Vector3 dV;
 	Ogre::Vector3 dim;
 	Paddle(Ogre::SceneManager *newManager);
 	Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos);

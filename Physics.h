@@ -8,7 +8,6 @@
 #include <map>
 #include "Sphere.h"
 #include "Room.h"
-#include "Timer.h"
 #include "Block.h"
 #include "Paddle.h"
 
@@ -26,7 +25,7 @@ public:
 	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad);
 	~Physics();
 
-	int checkCollide();							// Check for collisions between specific objects
+	int checkCollide(Paddle* &pad);							// Check for collisions between specific objects
 	void update(double tStep, double rate);		// Update the simulation (simulation step)
 	void updatePaddle(Paddle* &pad);			// Update position of the paddle's hit area to match the paddle graphic
 private:

@@ -320,7 +320,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
 	}
 	engine->update(dt, 1000);
-	index = engine->checkCollide();
+	index = engine->checkCollide(paddle);
 	if (index > 0) {
 		blocks.at(index-1)->destroy();
 	}
@@ -441,6 +441,7 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
+	paddle->lPosition = paddle->position;
 	Ogre::Vector3* paddleCoords = &paddle->position;
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
@@ -467,6 +468,7 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     }
 
 	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+	paddle->dV = paddle->lPosition - paddle->position;
 	engine->updatePaddle(paddle);
     printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
@@ -492,7 +494,6 @@ void BaseApplication::windowResized(Ogre::RenderWindow* rw)
     unsigned int width, height, depth;
     int left, top;
     rw->getMetrics(width, height, depth, left, top);
-	rw->setFullscreen(false, 800, 600);
 
     const OIS::MouseState &ms = mMouse->getMouseState();
     ms.width = width;
