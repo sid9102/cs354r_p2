@@ -16,6 +16,9 @@ http://www.ogre3d.org/wiki/
 */
 
 #include "BaseApplication.h"
+#include "Paddle.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>
@@ -268,6 +271,10 @@ bool BaseApplication::setup(void)
 
     createFrameListener();
 
+    // Initialize the SDL_Mixer
+    SDL_Init(SDL_INIT_AUDIO);
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
+
     return true;
 };
 //---------------------------------------------------------------------------
@@ -319,11 +326,21 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
 		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
 	}
+
+
+    Mix_Chunk* effect1 = Mix_LoadWAV("resources/Snare-Drum-1.wav");
+
 	engine->update(dt, 1000);
 	index = engine->checkCollide(paddle);
 	if (index > 0) {
-		blocks.at(index-1)->destroy();
+        Mix_PlayChannel(-1, effect1, 0);
+        blocks.at(index-1)->destroy();
 	}
+
+    /* Play appropriate sound */
+
+
+
 	/*/
 	newTime = time(0);
 	frameTime = newTime - currentTime;

@@ -19,7 +19,9 @@ http://www.ogre3d.org/wiki/
 #include <iostream>
 #include <string>
 #include <OgreVector3.h>
-#include <OgreVector3.h>
+#include "Paddle.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 #define ROOM_DIM 1000
 
 //---------------------------------------------------------------------------
@@ -65,6 +67,13 @@ void TutorialApplication::createScene(void)
 	blocks.at(0)->setPosition(400, 200, 0);
 	blocks.at(0)->setSize(50, 20, 20);
 	engine = new Physics(balls, blocks, emptyRoom, paddle);
+<<<<<<< HEAD
+=======
+
+
+    
+    // Note: This still needs to be closed after use/closing the application
+>>>>>>> 903b4bfa6205a0d2f5f9386ea90f9f93ced49e94
 }
 
 //---------------------------------------------------------------------------
