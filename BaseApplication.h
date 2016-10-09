@@ -26,6 +26,8 @@ http://www.ogre3d.org/wiki/
 #include <OgreSceneManager.h>
 #include <OgreRenderWindow.h>
 #include <OgreConfigFile.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
 #include <vector>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE

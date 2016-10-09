@@ -16,9 +16,6 @@ http://www.ogre3d.org/wiki/
 */
 
 #include "BaseApplication.h"
-#include "Paddle.h"
-#include <SDL.h>
-#include <SDL_mixer.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>

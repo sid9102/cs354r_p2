@@ -19,7 +19,11 @@ http://www.ogre3d.org/wiki/
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
-#include "Paddle.h"
+#include <iostream>
+#include <string>
+#include <OgreVector3.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 //---------------------------------------------------------------------------
 
