@@ -16,7 +16,7 @@ http://www.ogre3d.org/wiki/
 */
 
 #include "TutorialApplication.h"
-using namespace CEGUI;
+//using namespace CEGUI;
 
 //---------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)

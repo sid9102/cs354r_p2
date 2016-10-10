@@ -326,7 +326,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}
 
 
-    Mix_Chunk* effect1 = Mix_LoadWAV("resources/Snare-Drum-1.wav");
+    Mix_Chunk* effect1 = Mix_LoadWAV("resources/Explosion.wav");
 
 	engine->update(dt, 1000);
 	index = engine->checkCollide(paddle, blocks);
