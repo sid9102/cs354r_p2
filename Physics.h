@@ -10,6 +10,8 @@
 #include "Room.h"
 #include "Block.h"
 #include "Paddle.h"
+#include <SDL.h>
+#include <SDL_mixer.h>
 
 #define MAX_BLOCKS 999
 class Physics
@@ -28,6 +30,9 @@ public:
 	int checkCollide(Paddle* &pad, std::vector<Block*> &blk); // Check for collisions between specific objects
 	void update(double tStep, double rate);					  // Update the simulation (simulation step)
 	void updatePaddle(Paddle* &pad);						  // Update position of the paddle's hit area to match the paddle graphic
+
+	// Sounds
+	Mix_Chunk* bounce;
 private:
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;

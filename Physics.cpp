@@ -145,6 +145,9 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 		blockRigidBody.at(j)->setRestitution(.8);
 		dynamicsWorld->addRigidBody(blockRigidBody.at(j));
 	}
+    SDL_Init(SDL_INIT_AUDIO);
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
+    bounce = Mix_LoadWAV("resources/bounce.wav");
 }
 
 int Physics::checkCollide(Paddle* &pad, std::vector<Block*> &blk) {
@@ -164,6 +167,7 @@ int Physics::checkCollide(Paddle* &pad, std::vector<Block*> &blk) {
 			btManifoldPoint& pt = contactManifold->getContactPoint(j);
 			if (pt.getDistance() <= 0)
 			{
+                Mix_PlayChannel(-1, bounce, 0);
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
 						ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));

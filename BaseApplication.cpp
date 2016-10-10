@@ -273,7 +273,7 @@ bool BaseApplication::setup(void)
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     explosion = Mix_LoadWAV("resources/Explosion.wav");
-    woosh = Mix_LoadWAV("resources/Swing.wav");
+    woosh = Mix_LoadWAV("resources/woosh.wav");
     return true;
 };
 //---------------------------------------------------------------------------
@@ -483,7 +483,11 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 	paddle->dV = paddle->lPosition - paddle->position;
 	engine->updatePaddle(paddle);
-    printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
+    if(xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25)
+    {
+        Mix_PlayChannel(-1, woosh, 0);
+    }
+//    printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
 }
 //---------------------------------------------------------------------------
