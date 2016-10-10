@@ -26,7 +26,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	for (int i = 0; i < len; i++)
 		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width, blocks.at(i)->length, blocks.at(i)->height)));
 
-	paddleShape = new btCylinderShapeX(btVector3(4, pad->dim.x, pad->dim.x));
+	paddleShape = new btCapsuleShapeX(pad->dim.x, 4);
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
