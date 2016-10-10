@@ -148,11 +148,11 @@ void BaseApplication::createFrameListener(void)
     items.push_back("");
     items.push_back("Filtering");
     items.push_back("Poly Mode");
-
+    items.push_back("FPS");
     mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
     mDetailsPanel->setParamValue(9, "Bilinear");
     mDetailsPanel->setParamValue(10, "Solid");
-    mDetailsPanel->hide();
+//    mDetailsPanel->hide();
 
     mRoot->addFrameListener(this);
 }
@@ -272,7 +272,8 @@ bool BaseApplication::setup(void)
     // Initialize the SDL_Mixer
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
-
+    snareDrum = Mix_LoadWAV("resources/Snare-Drum-1.wav");
+    woosh = Mix_LoadWAV("resources/Swing.wav");
     return true;
 };
 //---------------------------------------------------------------------------
@@ -295,7 +296,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));
+            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
             mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
             mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
@@ -325,13 +326,10 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
 	}
 
-
-    Mix_Chunk* effect1 = Mix_LoadWAV("resources/Explosion.wav");
-
-	engine->update(dt, 1000);
+	engine->update(evt.timeSinceLastFrame, 100);
 	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
-        Mix_PlayChannel(-1, effect1, 0);
+        Mix_PlayChannel(-1, snareDrum, 0);
         blocks.at(index-1)->destroy();
 	}
 

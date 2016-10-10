@@ -34,9 +34,9 @@ void TutorialApplication::createScene(void)
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
-	// Create a light and position it in the room
-	//Ogre::Light* light = mSceneMgr->createLight("MainLight");
-	//light->setPosition(20, 80, 50);
+	//Create a light and position it in the room
+	Ogre::Light* light = mSceneMgr->createLight("MainLight");
+	light->setPosition(20, 80, 50);
 
 	// A spotlight
 	Ogre::Light* spotlight = mSceneMgr->createLight("Spotlight");
@@ -57,9 +57,13 @@ void TutorialApplication::createScene(void)
 	paddle = new Paddle(mSceneMgr, Ogre::Vector3(-200, 250, 0));
 
 	balls.push_back(new Sphere(25, mSceneMgr));
+
 	blocks.push_back(new Block(mSceneMgr, Block::paper, 1));
 	blocks.at(0)->setPosition(400, 200, 0);
 	blocks.at(0)->setSize(50, 20, 20);
+	blocks.push_back(new Block(mSceneMgr, Block::paper, 2));
+	blocks.at(1)->setPosition(400, 400, 0);
+	blocks.at(1)->setSize(50, 20, 20);
 	engine = new Physics(balls, blocks, emptyRoom, paddle);
 }
 

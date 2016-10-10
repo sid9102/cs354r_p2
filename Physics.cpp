@@ -14,7 +14,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 	//Gravity set here, we need very light gravity (towards the paddle?)
-	dynamicsWorld->setGravity(btVector3(-10, 0, 0));
+	dynamicsWorld->setGravity(btVector3(-100, 0, 0));
 
 	// The physics object(s) representing our ball(s)
 	int len = balls.size();
@@ -107,7 +107,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 		ballRigidBody.push_back(new btRigidBody(physBallRigidBodyCI));
 
 		//set initial velocity of ball
-		ballRigidBody.at(j)->setLinearVelocity(btVector3(0, 40, -20));
+		ballRigidBody.at(j)->setLinearVelocity(btVector3(0, 40, -1000));
 		ballRigidBody.at(j)->setRestitution(1.0);
 		ballRigidBody.at(j)->setUserPointer(ballRigidBody.at(j));
 		userIndex[ballRigidBody.at(j)->getUserPointer()] = 1000 + 1000 * (j);
@@ -166,7 +166,7 @@ int Physics::checkCollide(Paddle* &pad, std::vector<Block*> &blk) {
 			{
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
-						ballRigidBody.at(0)->setLinearVelocity(btVector3(300, -40, (rand() % 40) - 20));
+						ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
 					if((userIndex[obA->getUserPointer()] < MAX_BLOCKS) && (userIndex[obA->getUserPointer()] >= 0)) {
 						int index = userIndex[obA->getUserPointer()];
