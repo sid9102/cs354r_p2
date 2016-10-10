@@ -92,11 +92,14 @@ public:
 	std::vector<Block*> blocks;
 	Physics* engine;
 	Paddle* paddle;
-	double currentTime = time(0);
+	double lastTime = time(0);
 	double newTime = 0.0;
 	double t = 0.0;
 	double dt = 1 / 60.0;
-	double frameTime = 0.0;
+
+	// Sounds
+    Mix_Chunk* snareDrum;
+    Mix_Chunk* woosh;
 	//CEGUI::OgreRenderer* mRenderer;
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
