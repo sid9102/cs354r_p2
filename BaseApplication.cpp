@@ -137,6 +137,9 @@ void BaseApplication::createFrameListener(void)
 
     // Create a params panel for displaying sample details
     Ogre::StringVector items;
+	items.push_back("Score: ");
+    items.push_back("Lives: ");
+	/*
     items.push_back("cam.pX");
     items.push_back("cam.pY");
     items.push_back("cam.pZ");
@@ -149,10 +152,11 @@ void BaseApplication::createFrameListener(void)
     items.push_back("Filtering");
     items.push_back("Poly Mode");
     items.push_back("FPS");
+	*/
     mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
-    mDetailsPanel->setParamValue(9, "Bilinear");
-    mDetailsPanel->setParamValue(10, "Solid");
-//    mDetailsPanel->hide();
+    //mDetailsPanel->setParamValue(9, "Bilinear");
+    //mDetailsPanel->setParamValue(10, "Solid");
+    //mDetailsPanel->hide();
 
     mRoot->addFrameListener(this);
 }
@@ -296,6 +300,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
+			mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(0)); // replace 0 w/score var
+			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(2)); // replace 2 w/lives var
+			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
             mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
@@ -303,6 +310,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
             mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
             mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
             mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
+			*/
         }
     }
 	/*
@@ -378,7 +386,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::String newVal;
         Ogre::TextureFilterOptions tfo;
         unsigned int aniso;
-
+		/*
         switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
         {
         case 'B':
@@ -405,6 +413,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
         Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
         mDetailsPanel->setParamValue(9, newVal);
+		*/
     }
     else if (arg.key == OIS::KC_R)   // cycle polygon rendering mode
     {
@@ -427,7 +436,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         }
 
         mCamera->setPolygonMode(pm);
-        mDetailsPanel->setParamValue(10, newVal);
+        //mDetailsPanel->setParamValue(10, newVal);
     }
     else if(arg.key == OIS::KC_F5)   // refresh all textures
     {
