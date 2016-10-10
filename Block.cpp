@@ -42,17 +42,68 @@ Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
 		}
 		case(metal):
 		{
-			durability = 1000;
+			durability = 1500;
 			points = 0;
+			break;
+		}
+		default:
+		{
+			durability = 1;
+			points = 1;
 			break;
 		}
 	}
 
-	durability = 1;
-	points = 1;
-
 	damage = 0;
-	powerup = none;
+	int random = rand() % 8;
+	switch(random)
+	{
+		case(0):
+		{
+			powerup = spare;
+			break;
+		}
+		case(1):
+		{
+			powerup = sticky;
+			break;
+		}
+		case(2):
+		{
+			powerup = explosion;
+			break;
+		}
+		case(3):
+		{
+			powerup = penetrate;
+			break;
+		}
+		case(4):
+		{
+			powerup = multi;
+			break;
+		}
+		case(5):
+		{
+			powerup = widen;
+			break;
+		}
+		case(6):
+		{
+			powerup = slow;
+			break;
+		}
+		case(7):
+		{
+			powerup = gun;
+			break;
+		}
+		default:
+		{
+			powerup = none;
+			break;
+		}
+	}
 	blockManager = newManager;
 	buildBlock();
 }
@@ -67,13 +118,54 @@ Ogre::Vector3 Block::getPos() {
 
 void Block::destroy()
 {
-	blockEntity->setVisible(false);
+	damage = damage + 1;
+	if(damage>=durability)
+	{
+		blockEntity->setVisible(false);	
+		switch(powerup)
+		{
+			case(spare):
+			{
+				//addLife();	 
+				break;
+			}
+			case(sticky):
+			{
+				//stick();
+				break;
+			}
+			case(explosion):
+			{
+				break;
+			}
+			case(penetrate):
+			{
+				break;
+			}
+			case(multi):
+			{
+				break;
+			}
+			case(widen):
+			{
+				break;
+			}
+			case(slow):
+			{
+				break;
+			}
+			case(gun):
+			{
+				break;
+			}
+			default:
+			{
+				break;
+			}
+		}
+	}
 }
 
-/*void Block::collision()
-{
-	damage++;
-}*/
 
 int Block::getID()
 {
@@ -126,7 +218,6 @@ void Block::setSize(double x, double y, double z) {
 	length = y;
 	height = z;
 	blockNode->setScale(Ogre::Vector3((width / 250.0) * 100.0, (length / 100.0) * 100.0, (height / 100.0) * 100.0));
-	blockNode->rotate(Ogre::Quaternion(Ogre::Radian(PI/2), Ogre::Vector3(0, 1, 0)));
 }
 Ogre::Vector3 Block::getPosition() {
 	return blockNode->getPosition();

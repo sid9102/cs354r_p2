@@ -48,8 +48,8 @@ http://www.ogre3d.org/wiki/
 #  include <SdkCameraMan.h>
 #endif
 
-#include <CEGUI/RendererModules/Ogre/Renderer.h>
-#include <CEGUI/CEGUI.h>
+//#include <CEGUI/RendererModules/Ogre/Renderer.h>
+//#include <CEGUI/CEGUI.h>
 #include "Sphere.h"
 #include "Block.h"
 #include "Room.h"
@@ -97,7 +97,7 @@ public:
 	double t = 0.0;
 	double dt = 1 / 60.0;
 	double frameTime = 0.0;
-	CEGUI::OgreRenderer* mRenderer;
+	//CEGUI::OgreRenderer* mRenderer;
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
 protected:
@@ -119,7 +119,7 @@ protected:
     virtual bool mouseMoved(const OIS::MouseEvent &arg);
     virtual bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
     virtual bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	bool quit(const CEGUI::EventArgs &e);
+	//bool quit(const CEGUI::EventArgs &e);
     // Adjust mouse clipping area
     virtual void windowResized(Ogre::RenderWindow* rw);
     // Unattach OIS before window shutdown (very important under Linux)
