@@ -147,7 +147,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	}
 }
 
-int Physics::checkCollide(Paddle* &pad) {
+int Physics::checkCollide(Paddle* &pad, std::vector<Block*> &blk) {
 	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
 	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i<numManifolds; i++)
@@ -170,19 +170,25 @@ int Physics::checkCollide(Paddle* &pad) {
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
 					if((userIndex[obA->getUserPointer()] < MAX_BLOCKS) && (userIndex[obA->getUserPointer()] >= 0)) {
 						int index = userIndex[obA->getUserPointer()];
-						userIndex[obA->getUserPointer()] = -1;
 						if ((index - 1) >= 0) {
-							dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							Block* hitBlock = blk.at(index - 1);
+							if (hitBlock->type != Block::metal && hitBlock->damage == (hitBlock->durability - 1)) {
+								userIndex[obA->getUserPointer()] = -1;
+								dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							}
+							return index;
 						}
-						return index;
 					}
 					else if((userIndex[obB->getUserPointer()] < MAX_BLOCKS) && (userIndex[obB->getUserPointer()] >= 0)) {
 						int index = userIndex[obB->getUserPointer()];
-						userIndex[obB->getUserPointer()] = -1;
 						if ((index - 1) >= 0) {
-							dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							Block* hitBlock = blk.at(index - 1);
+							if (hitBlock->type != Block::metal && hitBlock->damage == (hitBlock->durability - 1)) {
+								userIndex[obB->getUserPointer()] = -1;
+								dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							}
+							return index;
 						}
-						return index;
 					}
 					else if (userIndex[obA->getUserPointer()] == 8000 || userIndex[obA->getUserPointer()] == 8000) {
 						ballRigidBody.at(0)->setLinearVelocity(btVector3(200, pad->dV.y, pad->dV.z));

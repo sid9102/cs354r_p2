@@ -70,6 +70,7 @@ bool BaseApplication::configure(void)
         // If returned true, user clicked OK so initialise.
         // Here we choose to let the system create a default rendering window by passing 'true'.
         mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
+		mWindow->setFullscreen(false, 800, 600);
         return true;
     }
     else
@@ -328,7 +329,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     Mix_Chunk* effect1 = Mix_LoadWAV("resources/Snare-Drum-1.wav");
 
 	engine->update(dt, 1000);
-	index = engine->checkCollide(paddle);
+	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
         Mix_PlayChannel(-1, effect1, 0);
         blocks.at(index-1)->destroy();

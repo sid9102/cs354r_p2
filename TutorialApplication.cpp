@@ -16,7 +16,6 @@ http://www.ogre3d.org/wiki/
 */
 
 #include "TutorialApplication.h"
-
 #define ROOM_DIM 1000
 
 //---------------------------------------------------------------------------

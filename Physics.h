@@ -25,9 +25,9 @@ public:
 	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad);
 	~Physics();
 
-	int checkCollide(Paddle* &pad);							// Check for collisions between specific objects
-	void update(double tStep, double rate);		// Update the simulation (simulation step)
-	void updatePaddle(Paddle* &pad);			// Update position of the paddle's hit area to match the paddle graphic
+	int checkCollide(Paddle* &pad, std::vector<Block*> &blk); // Check for collisions between specific objects
+	void update(double tStep, double rate);					  // Update the simulation (simulation step)
+	void updatePaddle(Paddle* &pad);						  // Update position of the paddle's hit area to match the paddle graphic
 private:
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;
