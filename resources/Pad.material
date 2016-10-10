@@ -16,7 +16,6 @@ material Pad
             scene_blend alpha_blend
             alpha_rejection greater 64
             depth_write off
-	    colour_op alpha_blend
 
         }
     }
