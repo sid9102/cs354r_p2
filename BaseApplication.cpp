@@ -272,7 +272,7 @@ bool BaseApplication::setup(void)
     // Initialize the SDL_Mixer
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
-    snareDrum = Mix_LoadWAV("resources/Snare-Drum-1.wav");
+    explosion = Mix_LoadWAV("resources/Explosion.wav");
     woosh = Mix_LoadWAV("resources/Swing.wav");
     return true;
 };
@@ -329,7 +329,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	engine->update(evt.timeSinceLastFrame, 100);
 	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
-        Mix_PlayChannel(-1, snareDrum, 0);
+        Mix_PlayChannel(-1, explosion, 0);
         blocks.at(index-1)->destroy();
 	}
 

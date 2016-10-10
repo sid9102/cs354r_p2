@@ -98,7 +98,7 @@ public:
 	double dt = 1 / 60.0;
 
 	// Sounds
-    Mix_Chunk* snareDrum;
+    Mix_Chunk* explosion;
     Mix_Chunk* woosh;
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 

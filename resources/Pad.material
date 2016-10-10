@@ -1,3 +1,4 @@
+
 // Pad genrated by blender2ogre 0.6.0
 
 material Pad 
@@ -8,27 +9,14 @@ material Pad
     {
         pass Pad
         {
-            ambient 0.0 0.746005654335022 0.800000011920929 1.0
-            diffuse 0.0 0.596804532361098 0.6400000190734865 1.0
-            specular 0.4845360815525055 0.4845360815525055 0.4845360815525055 1.0 12.5
-            emissive 0.0 0.0 0.0 1.0
+            ambient 0.0 0.746005654335022 0.800000011920929 0.4
+            diffuse 0.0 0.596804532361098 0.6400000190734865 0.4
+            specular 1 1 1 1 20
 
-            alpha_to_coverage off
-            colour_write on
-            cull_hardware clockwise
-            depth_check on
-            depth_func less_equal
-            depth_write on
-            illumination_stage 
-            light_clip_planes off
-            light_scissor off
-            lighting on
-            normalise_normals off
-            polygon_mode solid
-            scene_blend one zero
-            scene_blend_op add
-            shading gouraud
-            transparent_sorting on
+            scene_blend alpha_blend
+            alpha_rejection greater 64
+            depth_write off
+	    colour_op alpha_blend
 
         }
     }
