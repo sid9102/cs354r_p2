@@ -206,6 +206,7 @@ void Block::buildBlock() {
 	
 
 	blockNode->setPosition(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
+	blockNode->setOrientation(Ogre::Quaternion((Ogre::Radian)PI/2, Ogre::Vector3(0.0, 1.0, 0.0)));
 	blockEntity->setCastShadows(true);
 	blockNode->attachObject(blockEntity);
 }

@@ -24,7 +24,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// Create blocks
 	len = blocks.size();
 	for (int i = 0; i < len; i++)
-		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->length, blocks.at(i)->width, blocks.at(i)->height)));
+		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width, blocks.at(i)->length, blocks.at(i)->height)));
 
 	paddleShape = new btCylinderShapeX(btVector3(4, pad->dim.x, pad->dim.x));
 

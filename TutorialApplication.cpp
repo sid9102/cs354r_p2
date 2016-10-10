@@ -16,7 +16,7 @@ http://www.ogre3d.org/wiki/
 */
 
 #include "TutorialApplication.h"
-#define ROOM_DIM 1000
+using namespace CEGUI;
 
 //---------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
@@ -72,29 +72,21 @@ void TutorialApplication::createScene(void)
 #ifdef __cplusplus
 extern "C" {
 #endif
+	int main(int argc, char *argv[])
+		//#endif
+	{
+		// Create application object
+		TutorialApplication app;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
-#else
-    int main(int argc, char *argv[])
-#endif
-    {
-        // Create application object
-        TutorialApplication app;
+		try {
+			app.go();
+		}
+		catch (Ogre::Exception& e) {
 
-        try {
-            app.go();
-        } catch(Ogre::Exception& e)  {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            MessageBox(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
-#else
-            std::cerr << "An exception has occurred: " <<
-                e.getFullDescription().c_str() << std::endl;
-#endif
-        }
+		}
 
-        return 0;
-    }
+		return 0;
+	}
 
 #ifdef __cplusplus
 }
