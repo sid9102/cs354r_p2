@@ -28,7 +28,7 @@ public:
 
 	//void setPos(int x, int y, int z);
 	//Ogre::Vector3 getPos();
-	void destroy();
+	int destroy();
 	//void collision();
 	int getID();
 	Ogre::SceneManager *blockManager;

@@ -169,8 +169,10 @@ int Physics::checkCollide(Paddle* &pad, std::vector<Block*> &blk) {
 			{
                 Mix_PlayChannel(-1, bounce, 0);
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
-					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000)
+					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000) {
 						ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));
+						return -5;
+					}
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
 					if((userIndex[obA->getUserPointer()] < MAX_BLOCKS) && (userIndex[obA->getUserPointer()] >= 0)) {
 						int index = userIndex[obA->getUserPointer()];

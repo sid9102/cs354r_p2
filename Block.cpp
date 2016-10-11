@@ -19,30 +19,30 @@ Block::Block(Ogre::SceneManager *newManager, Type t, int num) {
 		case(paper):
 		{
 			durability = 1;
-			points = 1;
+			points = 10;
 			break;
 		}
 		case(wood):
 		{
 			durability = 2;
-			points = 2;
+			points = 25;
 			break;
 		}
 		case(stone):
 		{
 			durability = 3;
-			points = 3;
+			points = 50;
 			break;
 		}
 		case(brick):
 		{
 			durability = 4;
-			points = 4;
+			points = 100;
 			break;
 		}
 		case(metal):
 		{
-			durability = 1500;
+			durability = 100000;
 			points = 0;
 			break;
 		}
@@ -116,7 +116,7 @@ Ogre::Vector3 Block::getPos() {
 	return Ogre::Vector3(blockNode->getPosition().x, blockNode->getPosition().y, blockNode->getPosition().z);
 }*/
 
-void Block::destroy()
+int Block::destroy()
 {
 	damage = damage + 1;
 	if(damage>=durability)
@@ -162,8 +162,10 @@ void Block::destroy()
 			{
 				break;
 			}
-		}
+		}	
+		return points;
 	}
+	else return 0;
 }
 
 

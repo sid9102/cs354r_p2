@@ -20,7 +20,8 @@ http://www.ogre3d.org/wiki/
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>
 #endif
-
+int score = 0;
+int lives = 2;
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
     : mRoot(0),
@@ -70,7 +71,7 @@ bool BaseApplication::configure(void)
         // If returned true, user clicked OK so initialise.
         // Here we choose to let the system create a default rendering window by passing 'true'.
         mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
-		mWindow->setFullscreen(false, 800, 600);
+		mWindow->setFullscreen(true, 1920, 1200);
         return true;
     }
     else
@@ -300,8 +301,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-			mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(0)); // replace 0 w/score var
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(2)); // replace 2 w/lives var
+			mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
+			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
@@ -338,7 +339,10 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
         Mix_PlayChannel(-1, explosion, 0);
-        blocks.at(index-1)->destroy();
+        score += blocks.at(index-1)->destroy();
+	}
+	else if (index == -5) {
+		lives--;
 	}
 
     /* Play appropriate sound */
