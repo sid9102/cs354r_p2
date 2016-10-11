@@ -22,6 +22,7 @@ http://www.ogre3d.org/wiki/
 #endif
 int score = 0;
 int lives = 2;
+int lastHit = 0;
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
     : mRoot(0),
@@ -336,13 +337,17 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}
 
 	engine->update(evt.timeSinceLastFrame, 100);
+	lastHit++;
 	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
         Mix_PlayChannel(-1, explosion, 0);
         score += blocks.at(index-1)->destroy();
 	}
 	else if (index == -5) {
-		lives--;
+		if(lastHit>15) {
+			lastHit = 0;
+			lives--;
+		}
 	}
 
     /* Play appropriate sound */
