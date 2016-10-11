@@ -218,7 +218,7 @@ void Block::setSize(double x, double y, double z) {
 	width = x;
 	length = y;
 	height = z;
-	blockNode->setScale(Ogre::Vector3((width / 250.0) * 100.0, (length / 100.0) * 100.0, (height / 100.0) * 100.0));
+	blockNode->setScale(Ogre::Vector3(width / 5, length / 2, height / 2));
 }
 Ogre::Vector3 Block::getPosition() {
 	return blockNode->getPosition();
