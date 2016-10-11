@@ -283,6 +283,12 @@ bool BaseApplication::setup(void)
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     explosion = Mix_LoadWAV("resources/Explosion.wav");
     woosh = Mix_LoadWAV("resources/woosh.wav");
+    metal_sound = Mix_LoadWAV("resources/Tone.wav");
+    paper_sound = Mix_LoadWAV("resources/Paper_Rip.wav");
+    brick_sound = Mix_LoadWAV("resources/Punch.wav");
+    wood_sound = Mix_LoadWAV("resources/Neck_Snap.wav");
+    stone_sound = Mix_LoadWAV("resources/Metal_Pot.wav");
+
     return true;
 };
 //---------------------------------------------------------------------------
@@ -348,17 +354,34 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	lastHit++;
 	index = engine->checkCollide(paddle, blocks);
 	if (index > 0) {
-        Mix_PlayChannel(-1, explosion, 0);
-        score += blocks.at(index-1)->destroy();
-	}
-	else if (index == -5) {
-		if(lastHit>15) {
-			lastHit = 0;
-			lives--;
-		}
+            Mix_PlayChannel(-1, explosion, 0);
+            score += blocks.at(index-1)->destroy();
 	}
 
-    /* Play appropriate sound */
+    /* Need a switch here to play the appropriate sound */
+	if (index > 0) {
+        // Mix_PlayChannel(-1, explosion, 0);
+        blocks.at(index-1)->destroy();
+
+        /* Play appropriate sound */
+        switch (blocks.at(index-1)->type){
+            case paper:
+                Mix_PlayChannel(-1, paper_sound, 0);
+                break;
+            case wood:
+                Mix_PlayChannel(-1, wood_sound, 0);
+                break;
+            case stone:
+                Mix_PlayChannel(-1, stone_sound, 0);
+                break;
+            case brick:
+                Mix_PlayChannel(-1, brick_sound, 0);
+                break;
+            case metal:
+                Mix_PlayChannel(-1, metal_sound, 0);
+                break;
+        }
+    }
 
 
 

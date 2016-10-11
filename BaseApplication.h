@@ -100,6 +100,15 @@ public:
 	// Sounds
     Mix_Chunk* explosion;
     Mix_Chunk* woosh;
+    Mix_Chunk* metal_sound;
+    Mix_Chunk* brick_sound;
+    Mix_Chunk* stone_sound;
+    Mix_Chunk* wood_sound;
+    Mix_Chunk* paper_sound;
+
+    // Enum
+    enum Type { paper, wood, stone, brick, metal };
+
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
 protected:

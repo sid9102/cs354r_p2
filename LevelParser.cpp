@@ -43,7 +43,7 @@
 std::string level[] = {"pwsbm",
                        "psmbw",
                        "psmbw",
-                       "p"};
+                       "pwww"};
 
 std::vector<Block*> LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
 {
@@ -101,7 +101,7 @@ std::vector<Block*> LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::Sc
         }
         x = 400;
 
-        y += height + 5;
+        y += height + 20;
     }
     return blocks;
 }
