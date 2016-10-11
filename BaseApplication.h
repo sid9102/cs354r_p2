@@ -98,6 +98,7 @@ public:
 	double dt = 1 / 60.0;
 
 	// Sounds
+    bool soundOn = true;
     Mix_Chunk* explosion;
     Mix_Chunk* woosh;
     Mix_Chunk* metal_sound;
@@ -105,6 +106,7 @@ public:
     Mix_Chunk* stone_sound;
     Mix_Chunk* wood_sound;
     Mix_Chunk* paper_sound;
+    Mix_Music* bgm;
 
     // Enum
     enum Type { paper, wood, stone, brick, metal };

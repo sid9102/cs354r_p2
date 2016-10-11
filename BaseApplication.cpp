@@ -277,6 +277,7 @@ bool BaseApplication::setup(void)
     // Initialize the SDL_Mixer
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
+    bgm = Mix_LoadMUS("resources/bgm.wav");
     explosion = Mix_LoadWAV("resources/Explosion.wav");
     woosh = Mix_LoadWAV("resources/woosh.wav");
     metal_sound = Mix_LoadWAV("resources/Tone.wav");
@@ -284,6 +285,15 @@ bool BaseApplication::setup(void)
     brick_sound = Mix_LoadWAV("resources/Punch.wav");
     wood_sound = Mix_LoadWAV("resources/Neck_Snap.wav");
     stone_sound = Mix_LoadWAV("resources/Metal_Pot.wav");
+
+    if(soundOn){
+        Mix_PlayMusic(bgm, -1);
+        Mix_Resume(-1);
+    }
+    else{
+        Mix_Pause(-1);
+        Mix_PauseMusic();
+    }
 
     return true;
 };
@@ -345,29 +355,33 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	index = engine->checkCollide(paddle, blocks);
 
     /* Need a switch here to play the appropriate sound */
-	if (index > 0) {
-        // Mix_PlayChannel(-1, explosion, 0);
-        blocks.at(index-1)->destroy();
 
-        /* Play appropriate sound */
-        switch (blocks.at(index-1)->type){
-            case paper:
-                Mix_PlayChannel(-1, paper_sound, 0);
-                break;
-            case wood:
-                Mix_PlayChannel(-1, wood_sound, 0);
-                break;
-            case stone:
-                Mix_PlayChannel(-1, stone_sound, 0);
-                break;
-            case brick:
-                Mix_PlayChannel(-1, brick_sound, 0);
-                break;
-            case metal:
-                Mix_PlayChannel(-1, metal_sound, 0);
-                break;
+    	if (index > 0) {
+            // Mix_PlayChannel(-1, explosion, 0);
+            blocks.at(index-1)->destroy();
+
+            if(soundOn){
+            /* Play appropriate sound */
+                switch (blocks.at(index-1)->type){
+                    case paper:
+                        Mix_PlayChannel(-1, paper_sound, 0);
+                        break;
+                    case wood:
+                        Mix_PlayChannel(-1, wood_sound, 0);
+                        break;
+                    case stone:
+                        Mix_PlayChannel(-1, stone_sound, 0);
+                        break;
+                    case brick:
+                        Mix_PlayChannel(-1, brick_sound, 0);
+                        break;
+                    case metal:
+                        Mix_PlayChannel(-1, metal_sound, 0);
+                        break;
+                }
+            }
         }
-    }
+
 
 
 
@@ -476,6 +490,20 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     {
         mShutDown = true;
     }
+    else if (arg.key == OIS::KC_P){
+        if(soundOn){
+            soundOn = false;
+            engine->soundOn = false;
+            Mix_HaltChannel(-1);
+            Mix_PauseMusic();
+        }
+        else if(!soundOn){
+            soundOn = true;
+            engine->soundOn = true;
+            Mix_Resume(-1);
+            Mix_ResumeMusic();
+        }
+    }
 
     mCameraMan->injectKeyDown(arg);
     return true;
@@ -518,7 +546,7 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 	paddle->dV = paddle->lPosition - paddle->position;
 	engine->updatePaddle(paddle);
-    if(xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25)
+    if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);
     }

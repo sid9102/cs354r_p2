@@ -33,6 +33,7 @@ public:
 
 	// Sounds
 	Mix_Chunk* bounce;
+	bool soundOn = true;
 private:
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;
