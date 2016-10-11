@@ -40,18 +40,17 @@
  * pooop
  * ppppp
  */
-std::string level[] = {
-                  "w"};
-//                  "wwwwwwwwwwwwwwwwwwwwwwwww",
-//                  "wwwwwwwwwwwwwwwwwwwwwwwww",
-//                  "wwwwwwwwwwwwwwwwwwwwwwwww"};
+std::string level[] = {"pwsbm",
+                       "psmbw",
+                       "psmbw",
+                       "p"};
 
-void LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
+std::vector<Block*> LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
 {
     int id = 1;
-    double y = 200;
+    double y = 100;
     double x = 400;
-    double z = 0;
+    double z = -200;
     double width = 50;
     double height = 20;
     double length = 20;
@@ -82,14 +81,14 @@ void LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *cur
                     break;
             }
             printf("Placing block with id %i at (%f, %f, %f)\n", id, x, y, z);
-            blocks.at(id - 1)->setSize(50, 20, 20);
-            blocks.at(id - 1)->setPosition(400, 200, 0);
+            blocks.at(id - 1)->setSize(width, height, length);
+            blocks.at(id - 1)->setPosition(x, y, z);
 
-            z += width * 2 + 5;
+            z += width + 5;
             if(z >= 200)
             {
                 z = -200;
-                x -= length * 2 + 5;
+                x -= length + 5;
             }
             if(!gap)
             {
@@ -100,6 +99,9 @@ void LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *cur
                 gap = false;
             }
         }
-        y += height * 2 + 5;
+        x = 400;
+
+        y += height + 5;
     }
+    return blocks;
 }

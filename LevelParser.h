@@ -13,5 +13,5 @@
 class LevelParser
 {
 public:
-    static void parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager);
+    static std::vector<Block*> parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager);
 };

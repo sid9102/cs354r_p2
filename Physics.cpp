@@ -14,7 +14,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
 
 	//Gravity set here, we need very light gravity (towards the paddle?)
-	dynamicsWorld->setGravity(btVector3(-100, 0, 0));
+	dynamicsWorld->setGravity(btVector3(-300, 0, 0));
 
 	// The physics object(s) representing our ball(s)
 	int len = balls.size();
@@ -24,7 +24,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	// Create blocks
 	len = blocks.size();
 	for (int i = 0; i < len; i++)
-		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width, blocks.at(i)->length, blocks.at(i)->height)));
+		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width /2, blocks.at(i)->length /2, blocks.at(i)->height /2)));
 
 	paddleShape = new btCapsuleShapeX(pad->dim.x, 4);
 
