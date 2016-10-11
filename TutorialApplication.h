@@ -24,6 +24,7 @@ http://www.ogre3d.org/wiki/
 #include <OgreVector3.h>
 #include <SDL.h>
 #include <SDL_mixer.h>
+#include "LevelParser.h"
 
 //---------------------------------------------------------------------------
 

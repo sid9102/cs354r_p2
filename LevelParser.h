@@ -8,9 +8,10 @@
 #endif //CS354R_P2_LEVELPARSER_H
 
 #include "Block.h"
+#include <OgreSceneManager.h>
 
 class LevelParser
 {
 public:
-    static void parseLevel(std::vector<Block*> blocks);
+    static void parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager);
 };

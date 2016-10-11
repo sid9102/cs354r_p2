@@ -40,15 +40,22 @@
  * pooop
  * ppppp
  */
-std::string level[] = {"wwwww\nwbbbw\nwbmbw\nsbbbs\nsssss",
-                  "wwwww\nwbbbw\nwbmbw\nwbbbw\nsssss",
-                  "wwwww\nwsssw\npsmsp\npsssp\nppppp",
-                  "wwwww\npwwwp\npwmwp\npbbbp\nppppp",
-                  "wwwww\npooop\npooop\npooop\nppppp"};
+std::string level[] = {
+                  "w"};
+//                  "wwwwwwwwwwwwwwwwwwwwwwwww",
+//                  "wwwwwwwwwwwwwwwwwwwwwwwww",
+//                  "wwwwwwwwwwwwwwwwwwwwwwwww"};
 
-static void parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
+void LevelParser::parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManager)
 {
     int id = 1;
+    double y = 200;
+    double x = 400;
+    double z = 0;
+    double width = 50;
+    double height = 20;
+    double length = 20;
+    bool gap = false;
     for(std::string layer : level)
     {
         for(char& c : layer)
@@ -70,11 +77,29 @@ static void parseLevel(std::vector<Block*> blocks, Ogre::SceneManager *curManage
                 case 'm':
                     blocks.push_back(new Block(curManager, Block::metal, id));
                     break;
-                case 'o':
-                    // do nothing, but increment the id
+                default:
+                    gap = true;
                     break;
             }
-            id++;
+            printf("Placing block with id %i at (%f, %f, %f)\n", id, x, y, z);
+            blocks.at(id - 1)->setSize(50, 20, 20);
+            blocks.at(id - 1)->setPosition(400, 200, 0);
+
+            z += width * 2 + 5;
+            if(z >= 200)
+            {
+                z = -200;
+                x -= length * 2 + 5;
+            }
+            if(!gap)
+            {
+                id++;
+            }
+            else
+            {
+                gap = false;
+            }
         }
+        y += height * 2 + 5;
     }
 }
