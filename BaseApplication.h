@@ -152,6 +152,8 @@ protected:
     OgreBites::SdkTrayManager*	mTrayMgr;
     OgreBites::SdkCameraMan*    mCameraMan;     	// Basic camera controller
     OgreBites::ParamsPanel*     mDetailsPanel;   	// Sample details panel
+    OgreBites::TextBox*         mWinBox;   
+    OgreBites::TextBox*     mLoseBox;   
     bool                        mCursorWasVisible;	// Was cursor visible before dialog appeared?
     bool                        mShutDown;
 

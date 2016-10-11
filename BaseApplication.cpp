@@ -22,6 +22,7 @@ http://www.ogre3d.org/wiki/
 #endif
 int score = 0;
 int lives = 2;
+int lastHit = 0;
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
     : mRoot(0),
@@ -138,7 +139,7 @@ void BaseApplication::createFrameListener(void)
 
     // Create a params panel for displaying sample details
     Ogre::StringVector items;
-	items.push_back("Score: ");
+    items.push_back("Score: ");
     items.push_back("Lives: ");
 	/*
     items.push_back("cam.pX");
@@ -159,6 +160,9 @@ void BaseApplication::createFrameListener(void)
     //mDetailsPanel->setParamValue(10, "Solid");
     //mDetailsPanel->hide();
 
+    //mWinBox = mTrayMgr->createTextBox(OgreBites::TL_CENTER,"WinCap","Game Over", 100, 50);
+    //mWinBox->hide();
+	
     mRoot->addFrameListener(this);
 }
 //---------------------------------------------------------------------------
@@ -312,13 +316,18 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     mTrayMgr->frameRenderingQueued(evt);
 
+    if(score>=640||lives<=0) {
+        mDetailsPanel->hide();
+    	//mWinBox->show();
+    }
+
     if (!mTrayMgr->isDialogVisible())
     {
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-			mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
+		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
+		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
@@ -352,39 +361,42 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}
 
 	engine->update(evt.timeSinceLastFrame, 100);
+	lastHit++;
 	index = engine->checkCollide(paddle, blocks);
 
     /* Need a switch here to play the appropriate sound */
-
-    	if (index > 0) {
-            // Mix_PlayChannel(-1, explosion, 0);
-            blocks.at(index-1)->destroy();
-
+	if (index > 0) {
+        	// Mix_PlayChannel(-1, explosion, 0);
+        	score += blocks.at(index-1)->destroy();
+		
             if(soundOn){
-            /* Play appropriate sound */
-                switch (blocks.at(index-1)->type){
-                    case paper:
-                        Mix_PlayChannel(-1, paper_sound, 0);
-                        break;
-                    case wood:
-                        Mix_PlayChannel(-1, wood_sound, 0);
-                        break;
-                    case stone:
-                        Mix_PlayChannel(-1, stone_sound, 0);
-                        break;
-                    case brick:
-                        Mix_PlayChannel(-1, brick_sound, 0);
-                        break;
-                    case metal:
-                        Mix_PlayChannel(-1, metal_sound, 0);
-                        break;
-                }
-            }
-        }
-
-
-
-
+        	/* Play appropriate sound */
+        	switch (blocks.at(index-1)->type){
+        	    case paper:
+        	        Mix_PlayChannel(-1, paper_sound, 0);
+        	        break;
+        	    case wood:
+        	        Mix_PlayChannel(-1, wood_sound, 0);
+        	        break;
+        	    case stone:
+        	        Mix_PlayChannel(-1, stone_sound, 0);
+        	        break;
+        	    case brick:
+        	        Mix_PlayChannel(-1, brick_sound, 0);
+        	        break;
+        	    case metal:
+        	        Mix_PlayChannel(-1, metal_sound, 0);
+        	        break;
+        	}
+	    }
+	}
+	else if (index == -5) {
+		if(lastHit>15) {
+			lastHit = 0;
+			lives--;
+		}
+	}
+    
 	/*/
 	newTime = time(0);
 	frameTime = newTime - currentTime;
