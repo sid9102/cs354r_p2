@@ -139,7 +139,7 @@ void BaseApplication::createFrameListener(void)
 
     // Create a params panel for displaying sample details
     Ogre::StringVector items;
-	items.push_back("Score: ");
+    items.push_back("Score: ");
     items.push_back("Lives: ");
 	/*
     items.push_back("cam.pX");
@@ -160,6 +160,9 @@ void BaseApplication::createFrameListener(void)
     //mDetailsPanel->setParamValue(10, "Solid");
     //mDetailsPanel->hide();
 
+    //mWinBox = mTrayMgr->createTextBox(OgreBites::TL_CENTER,"WinCap","Game Over", 100, 50);
+    //mWinBox->hide();
+	
     mRoot->addFrameListener(this);
 }
 //---------------------------------------------------------------------------
@@ -297,13 +300,18 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     mTrayMgr->frameRenderingQueued(evt);
 
+    if(score>=640||lives<=0) {
+        mDetailsPanel->hide();
+    	//mWinBox->show();
+    }
+
     if (!mTrayMgr->isDialogVisible())
     {
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-			mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
+		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
+		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
