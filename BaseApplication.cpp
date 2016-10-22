@@ -414,28 +414,6 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}*/
 	//ball->update();
 	//emptyRoom->checkCollide(ball);
-
-    if(!isServer)
-    {
-        isServer = true;
-        IPaddress ip;
-        SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
-
-        const char* message="hello server!\n";
-
-        TCPsocket client=SDLNet_TCP_Open(&ip);
-
-        SDLNet_TCP_Send(client,message,strlen(message)+1);
-
-        char text[10000];
-
-        while(SDLNet_TCP_Recv(client,text,10000))
-            std::cout << text;
-
-        SDLNet_TCP_Close(client);
-
-        SDLNet_Quit();
-    }
     
     return true;
 }
@@ -548,7 +526,6 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     {
         if(isServer)
         {
-            isServer = false;
             IPaddress ip;
             SDLNet_ResolveHost(&ip, NULL, 1234);
             TCPsocket server=SDLNet_TCP_Open(&ip);
@@ -568,6 +545,25 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             SDLNet_TCP_Close(server);
 
             SDLNet_Quit();
+        } else
+        {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+
+                const char* message="hello server!\n";
+
+                TCPsocket client=SDLNet_TCP_Open(&ip);
+
+                SDLNet_TCP_Send(client,message,strlen(message)+1);
+
+                char text[10000];
+
+                while(SDLNet_TCP_Recv(client,text,10000))
+                    std::cout << text;
+
+                SDLNet_TCP_Close(client);
+
+                SDLNet_Quit();
         }
     }
 
