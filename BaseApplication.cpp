@@ -141,9 +141,8 @@ void BaseApplication::createFrameListener(void)
     Ogre::StringVector items;
     items.push_back("Score: ");
     items.push_back("Lives: ");
-	/*
-    items.push_back("cam.pX");
-    items.push_back("cam.pY");
+    items.push_back("received message");
+    /*items.push_back("cam.pY");
     items.push_back("cam.pZ");
     items.push_back("");
     items.push_back("cam.oW");
@@ -254,6 +253,7 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
+    isServer = true;
     mRoot = new Ogre::Root(mPluginsCfg);
 
     setupResources();
@@ -279,7 +279,7 @@ bool BaseApplication::setup(void)
     createFrameListener();
 
     // Initialize the SDL_Mixer
-    SDL_Init(SDL_INIT_AUDIO);
+    SDL_Init(SDL_INIT_EVERYTHING);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     bgm = Mix_LoadMUS("resources/bgm.wav");
     explosion = Mix_LoadWAV("resources/Explosion.wav");
@@ -299,6 +299,12 @@ bool BaseApplication::setup(void)
         Mix_PauseMusic();
     }
 
+
+    if(SDLNet_Init()==-1)
+    {
+        printf("SDLNet_Init: %s\n", SDLNet_GetError());
+        exit(2);
+    }
     return true;
 };
 //---------------------------------------------------------------------------
@@ -408,6 +414,28 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	}*/
 	//ball->update();
 	//emptyRoom->checkCollide(ball);
+
+    if(!isServer)
+    {
+        isServer = true;
+        IPaddress ip;
+        SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+
+        const char* message="hello server!\n";
+
+        TCPsocket client=SDLNet_TCP_Open(&ip);
+
+        SDLNet_TCP_Send(client,message,strlen(message)+1);
+
+        char text[10000];
+
+        while(SDLNet_TCP_Recv(client,text,10000))
+            std::cout << text;
+
+        SDLNet_TCP_Close(client);
+
+        SDLNet_Quit();
+    }
     
     return true;
 }
@@ -514,6 +542,32 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             engine->soundOn = true;
             Mix_Resume(-1);
             Mix_ResumeMusic();
+        }
+    }
+    else if (arg.key == OIS::KC_Z)
+    {
+        if(isServer)
+        {
+            isServer = false;
+            IPaddress ip;
+            SDLNet_ResolveHost(&ip, NULL, 1234);
+            TCPsocket server=SDLNet_TCP_Open(&ip);
+            TCPsocket client;
+            const char* text="HELLO CLIENT!\n";
+            while(1)
+            {
+                client=SDLNet_TCP_Accept(server);
+                if(client)
+                {
+                    //here you can communicate with the client
+                    SDLNet_TCP_Send(client,text,strlen(text)+1);
+                    SDLNet_TCP_Close(client);
+                    break;
+                }
+            }
+            SDLNet_TCP_Close(server);
+
+            SDLNet_Quit();
         }
     }
 

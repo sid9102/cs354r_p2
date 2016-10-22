@@ -29,6 +29,7 @@ http://www.ogre3d.org/wiki/
 #include <SDL.h>
 #include <SDL_mixer.h>
 #include <vector>
+#include <SDL_net.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #  include <OIS/OISEvents.h>
@@ -85,6 +86,7 @@ public:
     BaseApplication(void);
     virtual ~BaseApplication(void);
     virtual void go(void);
+    bool isServer;
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
