@@ -525,7 +525,6 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     {
         if(isServer)
         {
-            messageSent = true;
             IPaddress ip;
             SDLNet_ResolveHost(&ip, NULL, 1234);
             TCPsocket server=SDLNet_TCP_Open(&ip);
@@ -550,7 +549,6 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             SDLNet_Quit();
         }else
         {
-            messageSent = true;
                 IPaddress ip;
                 SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
 
