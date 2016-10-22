@@ -89,7 +89,6 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
-	std::vector<Block*> blocks;
 	Physics* engine;
 	Paddle* paddle;
 	double lastTime = time(0);
