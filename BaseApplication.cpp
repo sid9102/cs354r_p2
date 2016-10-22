@@ -538,11 +538,13 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
                 if(!connectionOpened)
                 {
                     client=SDLNet_TCP_Accept(server);
-                    connectionOpened = true;
+                    if(client)
+                    {
+                        connectionOpened = true;
+                    }
                 }
                 if(client)
                 {
-                    //here you can communicate with the client
                     SDLNet_TCP_Send(client,text,strlen(text)+1);
                     break;
                 }
@@ -551,7 +553,6 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             int bytes = 0;
             bytes = SDLNet_TCP_Recv(client,message,10000);
             std::cout << message;
-            printf("%d\n", bytes);
 
 //            SDLNet_TCP_Close(client);
 //            SDLNet_TCP_Close(server);
