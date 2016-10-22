@@ -542,6 +542,9 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
                     break;
                 }
             }
+            char message[10000];
+            while(SDLNet_TCP_Recv(client,message,10000))
+                std::cout << message;
             SDLNet_TCP_Close(server);
 
             SDLNet_Quit();
