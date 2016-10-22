@@ -524,9 +524,8 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     }
     else if (arg.key == OIS::KC_Z)
     {
-        if(isServer && !messageSent)
+        if(isServer)
         {
-            messageSent = true;
             IPaddress ip;
             SDLNet_ResolveHost(&ip, NULL, 1234);
             TCPsocket server=SDLNet_TCP_Open(&ip);
@@ -539,22 +538,21 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
                 {
                     //here you can communicate with the client
                     SDLNet_TCP_Send(client,text,strlen(text)+1);
-//                    SDLNet_TCP_Close(client);
                     break;
                 }
             }
-            char message[100];
-            while(SDLNet_TCP_Recv(client,message,100))
-                std::cout << message;
-            SDLNet_TCP_Close(client);
-            SDLNet_TCP_Close(server);
+            char message[10000];
+            int bytes = 0;
+            bytes = SDLNet_TCP_Recv(client,message,10000);
+            std::cout << message;
+            printf("%d\n", bytes);
 
-            SDLNet_Quit();
+//            SDLNet_TCP_Close(client);
+//            SDLNet_TCP_Close(server);
         }
 
-        if (!messageSent && !isServer)
+        if (!isServer)
         {
-            messageSent = true;
             IPaddress ip;
             SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
 
@@ -564,14 +562,12 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 
             SDLNet_TCP_Send(server,message,strlen(message)+1);
 
-            char text[100];
+            char text[10000];
 
-            while(SDLNet_TCP_Recv(server,text,100))
-                std::cout << text;
+            SDLNet_TCP_Recv(server,text,10000);
+            std::cout << text;
 
-            SDLNet_TCP_Close(server);
-
-            SDLNet_Quit();
+//            SDLNet_TCP_Close(server);
         }
     }
 
