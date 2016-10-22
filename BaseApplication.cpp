@@ -253,7 +253,7 @@ void BaseApplication::go(void)
 bool BaseApplication::setup(void)
 {
     isServer = true;
-    messageSent = false;
+    connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
     setupResources();
@@ -526,14 +526,20 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     {
         if(isServer)
         {
-            IPaddress ip;
-            SDLNet_ResolveHost(&ip, NULL, 1234);
-            TCPsocket server=SDLNet_TCP_Open(&ip);
-            TCPsocket client;
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, NULL, 1234);
+                server = SDLNet_TCP_Open(&ip);
+            }
             const char* text="HELLO CLIENT!\n";
             while(1)
             {
-                client=SDLNet_TCP_Accept(server);
+                if(!connectionOpened)
+                {
+                    client=SDLNet_TCP_Accept(server);
+                    connectionOpened = true;
+                }
                 if(client)
                 {
                     //here you can communicate with the client
@@ -553,13 +559,15 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 
         if (!isServer)
         {
-            IPaddress ip;
-            SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+                server=SDLNet_TCP_Open(&ip);
+                connectionOpened = true;
+            }
 
             const char* message="hello server!\n";
-
-            TCPsocket server=SDLNet_TCP_Open(&ip);
-
             SDLNet_TCP_Send(server,message,strlen(message)+1);
 
             char text[10000];

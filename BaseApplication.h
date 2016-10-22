@@ -86,8 +86,13 @@ public:
     BaseApplication(void);
     virtual ~BaseApplication(void);
     virtual void go(void);
+
+	// Socket shit
     bool isServer;
-    bool messageSent;
+    bool connectionOpened;
+	TCPsocket server;
+	TCPsocket client;
+
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
