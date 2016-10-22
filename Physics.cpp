@@ -159,13 +159,15 @@ int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2) {
                 		//Frontwall
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000) {
-						ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));
+						//ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));
+						dynamicsWorld->setGravity(btVector3(300, 0, 0));
 						return -5;
 					}
 				//Backwall
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 2500)
 					if (userIndex[obB->getUserPointer()] == 2500 || userIndex[obB->getUserPointer()] == 1000) {
-						ballRigidBody.at(0)->setLinearVelocity(btVector3(-1000, -40, (rand() % 40) - 20));
+						//ballRigidBody.at(0)->setLinearVelocity(btVector3(-1000, -40, (rand() % 40) - 20));
+						dynamicsWorld->setGravity(btVector3(-300, 0, 0));
 						return -10;
 					}
 				//p1 paddle + ball
