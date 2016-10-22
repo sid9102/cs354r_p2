@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad) {
+Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad1, Paddle* &pad2) {
 	// Helps eliminate pairs of object that should not collide
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -21,7 +21,7 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad) {
 	for(int i = 0; i < len; i++)
 		ballShape.push_back(new btSphereShape(balls.at(i)->radius));
 
-	paddleShape = new btCapsuleShapeX(pad->dim.x, 4);
+	paddleShape = new btCapsuleShapeX(pad1->dim.x, 4);
 
 	// dimensions of ground here :D
 	groundShape = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
@@ -110,23 +110,35 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad) {
 	}
 	
 	//Set properties for Paddle
-	paddleMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y, pad->position.z)));
+	//Paddle 1
+	paddleMotionState1 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad1->position.x, pad1->position.y, pad1->position.z)));
 	paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
-	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI(paddleMass, paddleMotionState, paddleShape, paddleInertia);
-	paddleRigidBody = new btRigidBody(paddleRigidBodyCI);
-	paddleRigidBody->setUserPointer(paddleRigidBody);
-	userIndex[paddleRigidBody->getUserPointer()] = 8000;
-	paddleRigidBody->setRestitution(0.0);
-	paddleRigidBody->setFriction(1.0);
-	paddleRigidBody->setRollingFriction(1.0);
-	dynamicsWorld->addRigidBody(paddleRigidBody);
+	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI1(paddleMass, paddleMotionState1, paddleShape, paddleInertia);
+	paddleRigidBody1 = new btRigidBody(paddleRigidBodyCI1);
+	paddleRigidBody1->setUserPointer(paddleRigidBody1);
+	userIndex[paddleRigidBody1->getUserPointer()] = 8000;
+	paddleRigidBody1->setRestitution(0.0);
+	paddleRigidBody1->setFriction(1.0);
+	paddleRigidBody1->setRollingFriction(1.0);
+	dynamicsWorld->addRigidBody(paddleRigidBody1);
+
+	//Paddle 2
+	paddleMotionState2 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad2->position.x, pad2->position.y, pad2->position.z)));
+	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI2(paddleMass, paddleMotionState2, paddleShape, paddleInertia);
+	paddleRigidBody2 = new btRigidBody(paddleRigidBodyCI2);
+	paddleRigidBody2->setUserPointer(paddleRigidBody2);
+	userIndex[paddleRigidBody2->getUserPointer()] = 16000;
+	paddleRigidBody2->setRestitution(0.0);
+	paddleRigidBody2->setFriction(1.0);
+	paddleRigidBody2->setRollingFriction(1.0);
+	dynamicsWorld->addRigidBody(paddleRigidBody2);
 
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     bounce = Mix_LoadWAV("resources/bounce.wav");
 }
 
-int Physics::checkCollide(Paddle* &pad) {
+int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2) {
 	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
 	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i<numManifolds; i++)
@@ -144,15 +156,30 @@ int Physics::checkCollide(Paddle* &pad) {
 			if (pt.getDistance() <= 0)
 			{
 				if(soundOn) { Mix_PlayChannel(-1, bounce, 0); }
-                
+                		//Frontwall
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 1500)
 					if (userIndex[obB->getUserPointer()] == 1500 || userIndex[obB->getUserPointer()] == 1000) {
 						ballRigidBody.at(0)->setLinearVelocity(btVector3(1000, -40, (rand() % 40) - 20));
 						return -5;
 					}
-				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
-					if (userIndex[obA->getUserPointer()] == 8000 || userIndex[obA->getUserPointer()] == 8000) {
-						ballRigidBody.at(0)->setLinearVelocity(btVector3(200, pad->dV.y, pad->dV.z));
+				//Backwall
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 2500)
+					if (userIndex[obB->getUserPointer()] == 2500 || userIndex[obB->getUserPointer()] == 1000) {
+						ballRigidBody.at(0)->setLinearVelocity(btVector3(-1000, -40, (rand() % 40) - 20));
+						return -10;
+					}
+				//p1 paddle + ball
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 8000) {
+					if (userIndex[obB->getUserPointer()] == 8000 || userIndex[obB->getUserPointer()] == 1000) {
+						//ballRigidBody.at(0)->setLinearVelocity(btVector3(200, pad1->dV.y, pad1->dV.z));
+						dynamicsWorld->setGravity(btVector3(300, 0, 0));
+					}
+				}
+				//p2 paddle + ball
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 16000) {
+					if (userIndex[obB->getUserPointer()] == 16000 || userIndex[obB->getUserPointer()] == 1000) {
+						//ballRigidBody.at(0)->setLinearVelocity(btVector3(-200, pad2->dV.y, pad2->dV.z));
+						dynamicsWorld->setGravity(btVector3(-300, 0, 0));
 					}
 				}
 			}
@@ -166,15 +193,30 @@ void Physics::update(double tStep, double rate) {
 }
 
 void Physics::updatePaddle(Paddle* &pad) {
-	dynamicsWorld->removeRigidBody(paddleRigidBody);
-	paddleMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y+5, pad->position.z)));
-	paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
-	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI(paddleMass, paddleMotionState, paddleShape, paddleInertia);
-	paddleRigidBody = new btRigidBody(paddleRigidBodyCI);
-	paddleRigidBody->setRestitution(2.0);
-	paddleRigidBody->setFriction(1.0);
-	paddleRigidBody->setRollingFriction(1.0);
-	dynamicsWorld->addRigidBody(paddleRigidBody);
+	if(pad->playerNum == 1) {
+		dynamicsWorld->removeRigidBody(paddleRigidBody1);
+		paddleMotionState1 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y+5, pad->position.z)));
+		paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
+		btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI1(paddleMass, paddleMotionState1, paddleShape, paddleInertia);
+		paddleRigidBody1 = new btRigidBody(paddleRigidBodyCI1);
+		paddleRigidBody1->setRestitution(2.0);
+		paddleRigidBody1->setFriction(1.0);
+		paddleRigidBody1->setRollingFriction(1.0);
+		userIndex[paddleRigidBody1->getUserPointer()] = 8000;
+		dynamicsWorld->addRigidBody(paddleRigidBody1);
+	}
+	else if(pad->playerNum == 2) {
+		dynamicsWorld->removeRigidBody(paddleRigidBody2);
+		paddleMotionState2 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad->position.x, pad->position.y+5, pad->position.z)));
+		paddleShape->calculateLocalInertia(paddleMass, paddleInertia);
+		btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI2(paddleMass, paddleMotionState2, paddleShape, paddleInertia);
+		paddleRigidBody2 = new btRigidBody(paddleRigidBodyCI2);
+		paddleRigidBody2->setRestitution(2.0);
+		paddleRigidBody2->setFriction(1.0);
+		paddleRigidBody1->setRollingFriction(1.0);
+		userIndex[paddleRigidBody2->getUserPointer()] = 16000;
+		dynamicsWorld->addRigidBody(paddleRigidBody2);
+	}
 }
 Physics::~Physics() {
 	int len;

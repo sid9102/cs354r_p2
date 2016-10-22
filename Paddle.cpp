@@ -6,14 +6,16 @@ Paddle::Paddle(Ogre::SceneManager *newManager) {
 	position = Ogre::Vector3(0, 0, 0);
 	lPosition = Ogre::Vector3(0, 0, 0);
 	dV = Ogre::Vector3(0, 0, 0);
+	playerNum = 1;
 	buildPaddle();
 }
-Paddle::Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos) {
+Paddle::Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos, int num) {
 	paddleManager = newManager;
 	position = nPos;
 	lPosition = nPos;
 	dV = Ogre::Vector3(0, 0, 0);
 	dim = Ogre::Vector3(80, 12, 120);
+	playerNum = num;
 	buildPaddle();
 }
 
@@ -23,7 +25,7 @@ void Paddle::setPos(int x, int y, int z) {
 }
 
 void Paddle::buildPaddle() {
-	paddleNode = paddleManager->getRootSceneNode()->createChildSceneNode("paddleNode");
+	paddleNode = paddleManager->getRootSceneNode()->createChildSceneNode("paddleNode" + playerNum);
 	paddleEntity = paddleManager->createEntity("Paddle.mesh");
 	paddleNode->attachObject(paddleEntity);
 	paddleNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90));

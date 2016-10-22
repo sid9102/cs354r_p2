@@ -21,13 +21,14 @@ public:
 	std::map<void*, int>		userIndex;		// Map holds the index of all objects
 	std::vector<btRigidBody*>	ballRigidBody;	// Holds the pointer to the physics objects for ball
 	std::vector<btRigidBody*>	blockRigidBody; // Holds the pointer to the physics objects for block
-	btRigidBody*				paddleRigidBody;// Holds the pointer to the hit area for the paddle
+	btRigidBody*			paddleRigidBody1;// Holds the pointer to the hit area for the paddle1
+	btRigidBody*			paddleRigidBody2;// Holds the pointer to the hit area for the paddle2
 
 	// Constructor and deconstructor declared here
-	Physics(std::vector<Sphere*>balls, Room* &space, Paddle* &pad);
+	Physics(std::vector<Sphere*>balls, Room* &space, Paddle* &pad1, Paddle* &pad2);
 	~Physics();
 
-	int checkCollide(Paddle* &pad); // Check for collisions between specific objects
+	int checkCollide(Paddle* &pad1, Paddle* &pad2); // Check for collisions between specific objects
 	void update(double tStep, double rate);					  // Update the simulation (simulation step)
 	void updatePaddle(Paddle* &pad);						  // Update position of the paddle's hit area to match the paddle graphic
 
@@ -56,7 +57,8 @@ private:
 	btDefaultMotionState* groundMotionState;
 	std::vector<btDefaultMotionState*> wallMotionState;
 	btDefaultMotionState* ceilMotionState;
-	btDefaultMotionState* paddleMotionState;
+	btDefaultMotionState* paddleMotionState1;
+	btDefaultMotionState* paddleMotionState2;
 
 	// Rigid bodies (the physical objects that interact with each other in the world)
 	btRigidBody* groundRigidBody;

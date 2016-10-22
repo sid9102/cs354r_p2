@@ -20,9 +20,6 @@ http://www.ogre3d.org/wiki/
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>
 #endif
-int score = 0;
-int lives = 2;
-int lastHit = 0;
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
     : mRoot(0),
@@ -139,8 +136,8 @@ void BaseApplication::createFrameListener(void)
 
     // Create a params panel for displaying sample details
     Ogre::StringVector items;
-    items.push_back("Score: ");
-    items.push_back("Lives: ");
+    items.push_back("Player 1 Lives: ");
+    items.push_back("Player 2 Lives: ");
 	/*
     items.push_back("cam.pX");
     items.push_back("cam.pY");
@@ -316,7 +313,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     mTrayMgr->frameRenderingQueued(evt);
 
-    if(score>=640||lives<=0) {
+    if(p1lives<=0||p2lives<=0) {
         mDetailsPanel->hide();
     	//mWinBox->show();
     }
@@ -326,8 +323,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
-		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
+		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
+		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
@@ -362,12 +359,18 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 	engine->update(evt.timeSinceLastFrame, 100);
 	lastHit++;
-	index = engine->checkCollide(paddle);
+	index = engine->checkCollide(paddle1, paddle2);
 
 	if (index == -5) {
 		if(lastHit>15) {
 			lastHit = 0;
-			lives--;
+			p1lives--;
+		}
+	}
+	else if (index == -10) {
+		if(lastHit>15) {
+			lastHit = 0;
+			p2lives--;
 		}
 	}
     
@@ -503,8 +506,8 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-	paddle->lPosition = paddle->position;
-	Ogre::Vector3* paddleCoords = &paddle->position;
+	paddle1->lPosition = paddle1->position;
+	Ogre::Vector3* paddleCoords = &paddle1->position;
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
     float xDiff = arg.state.X.rel;
@@ -529,9 +532,9 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
         paddleCoords->y = 0;
     }
 
-	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle->dV = paddle->lPosition - paddle->position;
-	engine->updatePaddle(paddle);
+	paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+	paddle1->dV = paddle1->lPosition - paddle1->position;
+	engine->updatePaddle(paddle1);
     if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);
