@@ -549,7 +549,9 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             SDLNet_TCP_Close(server);
 
             SDLNet_Quit();
-        } else if (!messageSent)
+        }
+
+        if (!messageSent && !isServer)
         {
             messageSent = true;
                 IPaddress ip;
