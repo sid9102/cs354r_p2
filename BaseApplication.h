@@ -87,6 +87,7 @@ public:
     virtual ~BaseApplication(void);
     virtual void go(void);
     bool isServer;
+    bool messageSent;
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
