@@ -154,7 +154,7 @@ void BaseApplication::createFrameListener(void)
     items.push_back("FPS");
 	*/
     mDetailsPanel = mTrayMgr->createParamsPanel(OgreBites::TL_NONE, "DetailsPanel", 200, items);
-    //mDetailsPanel->setParamValue(9, "Bilinear");�5f�5f�5f�5f�5f�5
+    //mDetailsPanel->setParamValue(9, "Bilinear");
     //mDetailsPanel->setParamValue(10, "Solid");
     //mDetailsPanel->hide();
 
@@ -253,7 +253,6 @@ void BaseApplication::go(void)
 bool BaseApplication::setup(void)
 {
     isServer = true;
-    messageSent = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
     setupResources();
@@ -524,7 +523,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     }
     else if (arg.key == OIS::KC_Z)
     {
-        if(isServer && !messageSent)
+        if(isServer)
         {
             messageSent = true;
             IPaddress ip;
@@ -549,9 +548,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             SDLNet_TCP_Close(server);
 
             SDLNet_Quit();
-        }
-
-        if (!messageSent && !isServer)
+        }else
         {
             messageSent = true;
                 IPaddress ip;
