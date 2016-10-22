@@ -25,21 +25,21 @@ int lives = 2;
 int lastHit = 0;
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
-    : mRoot(0),
-    mCamera(0),
-    mSceneMgr(0),
-    mWindow(0),
-    mResourcesCfg(Ogre::StringUtil::BLANK),
-    mPluginsCfg(Ogre::StringUtil::BLANK),
-    mTrayMgr(0),
-    mCameraMan(0),
-    mDetailsPanel(0),
-    mCursorWasVisible(false),
-    mShutDown(false),
-    mInputManager(0),
-    mMouse(0),
-    mKeyboard(0),
-    mOverlaySystem(0)
+        : mRoot(0),
+          mCamera(0),
+          mSceneMgr(0),
+          mWindow(0),
+          mResourcesCfg(Ogre::StringUtil::BLANK),
+          mPluginsCfg(Ogre::StringUtil::BLANK),
+          mTrayMgr(0),
+          mCameraMan(0),
+          mDetailsPanel(0),
+          mCursorWasVisible(false),
+          mShutDown(false),
+          mInputManager(0),
+          mMouse(0),
+          mKeyboard(0),
+          mOverlaySystem(0)
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     m_ResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
@@ -132,8 +132,8 @@ void BaseApplication::createFrameListener(void)
     mInputContext.mKeyboard = mKeyboard;
     mInputContext.mMouse = mMouse;
     mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);
-	mTrayMgr->hideFrameStats();
-	mTrayMgr->hideLogo();
+    mTrayMgr->hideFrameStats();
+    mTrayMgr->hideLogo();
     mTrayMgr->hideCursor();
 
     // Create a params panel for displaying sample details
@@ -160,7 +160,7 @@ void BaseApplication::createFrameListener(void)
 
     //mWinBox = mTrayMgr->createTextBox(OgreBites::TL_CENTER,"WinCap","Game Over", 100, 50);
     //mWinBox->hide();
-	
+
     mRoot->addFrameListener(this);
 }
 //---------------------------------------------------------------------------
@@ -207,7 +207,7 @@ void BaseApplication::setupResources(void)
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                archName, typeName, secName);
+                    archName, typeName, secName);
         }
     }
 }
@@ -224,7 +224,7 @@ void BaseApplication::loadResources(void)
 void BaseApplication::go(void)
 {
 #ifdef _DEBUG
-#ifndef OGRE_STATIC_LIB
+    #ifndef OGRE_STATIC_LIB
     mResourcesCfg = m_ResourcePath + "resources_d.cfg";
     mPluginsCfg = m_ResourcePath + "plugins_d.cfg";
 #else
@@ -324,7 +324,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     if(score>=640||lives<=0) {
         mDetailsPanel->hide();
-    	//mWinBox->show();
+        //mWinBox->show();
     }
 
     if (!mTrayMgr->isDialogVisible())
@@ -332,9 +332,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
-		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
-			/*
+            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(score)); // replace 0 w/score var
+            mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(lives)); // replace 2 w/lives var
+            /*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
             mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
@@ -342,79 +342,79 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
             mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
             mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
             mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-			*/
+            */
         }
     }
-	/*
-	for (int i = 0; i < NUM_SPHERE; i++) {
+    /*
+    for (int i = 0; i < NUM_SPHERE; i++) {
 
-		ball[i]->update();
-		emptyRoom->checkCollide(ball[i]);
-		for (int j = i + 1; j < NUM_SPHERE; j++) {
-			emptyRoom->checkCollide(ball[i], ball[j]);
-		}
-	}
-	*/
+        ball[i]->update();
+        emptyRoom->checkCollide(ball[i]);
+        for (int j = i + 1; j < NUM_SPHERE; j++) {
+            emptyRoom->checkCollide(ball[i], ball[j]);
+        }
+    }
+    */
 
-	btTransform trans;
-	int len = balls.size();
-	int index;
+    btTransform trans;
+    int len = balls.size();
+    int index;
 
-	for (int i = 0; i < len; i++) {
-		engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
-		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
-	}
+    for (int i = 0; i < len; i++) {
+        engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+        balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+        balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
+    }
 
-	engine->update(evt.timeSinceLastFrame, 100);
-	lastHit++;
-	index = engine->checkCollide(paddle, blocks);
+    engine->update(evt.timeSinceLastFrame, 100);
+    lastHit++;
+    index = engine->checkCollide(paddle, blocks);
 
     /* Need a switch here to play the appropriate sound */
-	if (index > 0) {
-        	// Mix_PlayChannel(-1, explosion, 0);
-        	score += blocks.at(index-1)->destroy();
-		
-            if(soundOn){
-        	/* Play appropriate sound */
-        	switch (blocks.at(index-1)->type){
-        	    case paper:
-        	        Mix_PlayChannel(-1, paper_sound, 0);
-        	        break;
-        	    case wood:
-        	        Mix_PlayChannel(-1, wood_sound, 0);
-        	        break;
-        	    case stone:
-        	        Mix_PlayChannel(-1, stone_sound, 0);
-        	        break;
-        	    case brick:
-        	        Mix_PlayChannel(-1, brick_sound, 0);
-        	        break;
-        	    case metal:
-        	        Mix_PlayChannel(-1, metal_sound, 0);
-        	        break;
-        	}
-	    }
-	}
-	else if (index == -5) {
-		if(lastHit>15) {
-			lastHit = 0;
-			lives--;
-		}
-	}
-    
-	/*/
-	newTime = time(0);
-	frameTime = newTime - currentTime;
-	currentTime = time(0);
+    if (index > 0) {
+        // Mix_PlayChannel(-1, explosion, 0);
+        score += blocks.at(index-1)->destroy();
 
-	while (frameTime >= 0) {
+        if(soundOn){
+            /* Play appropriate sound */
+            switch (blocks.at(index-1)->type){
+                case paper:
+                    Mix_PlayChannel(-1, paper_sound, 0);
+                    break;
+                case wood:
+                    Mix_PlayChannel(-1, wood_sound, 0);
+                    break;
+                case stone:
+                    Mix_PlayChannel(-1, stone_sound, 0);
+                    break;
+                case brick:
+                    Mix_PlayChannel(-1, brick_sound, 0);
+                    break;
+                case metal:
+                    Mix_PlayChannel(-1, metal_sound, 0);
+                    break;
+            }
+        }
+    }
+    else if (index == -5) {
+        if(lastHit>15) {
+            lastHit = 0;
+            lives--;
+        }
+    }
 
-		frameTime -= dt;
-	}*/
-	//ball->update();
-	//emptyRoom->checkCollide(ball);
-    
+    /*/
+    newTime = time(0);
+    frameTime = newTime - currentTime;
+    currentTime = time(0);
+
+    while (frameTime >= 0) {
+
+        frameTime -= dt;
+    }*/
+    //ball->update();
+    //emptyRoom->checkCollide(ball);
+
     return true;
 }
 //---------------------------------------------------------------------------
@@ -444,7 +444,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::String newVal;
         Ogre::TextureFilterOptions tfo;
         unsigned int aniso;
-		/*
+        /*
         switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
         {
         case 'B':
@@ -471,7 +471,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
         Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
         mDetailsPanel->setParamValue(9, newVal);
-		*/
+        */
     }
     else if (arg.key == OIS::KC_R)   // cycle polygon rendering mode
     {
@@ -480,17 +480,17 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 
         switch (mCamera->getPolygonMode())
         {
-        case Ogre::PM_SOLID:
-            newVal = "Wireframe";
-            pm = Ogre::PM_WIREFRAME;
-            break;
-        case Ogre::PM_WIREFRAME:
-            newVal = "Points";
-            pm = Ogre::PM_POINTS;
-            break;
-        default:
-            newVal = "Solid";
-            pm = Ogre::PM_SOLID;
+            case Ogre::PM_SOLID:
+                newVal = "Wireframe";
+                pm = Ogre::PM_WIREFRAME;
+                break;
+            case Ogre::PM_WIREFRAME:
+                newVal = "Points";
+                pm = Ogre::PM_POINTS;
+                break;
+            default:
+                newVal = "Solid";
+                pm = Ogre::PM_SOLID;
         }
 
         mCamera->setPolygonMode(pm);
@@ -539,13 +539,14 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
                 {
                     //here you can communicate with the client
                     SDLNet_TCP_Send(client,text,strlen(text)+1);
-                    SDLNet_TCP_Close(client);
+//                    SDLNet_TCP_Close(client);
                     break;
                 }
             }
-            char message[10000];
-            while(SDLNet_TCP_Recv(client,message,10000))
+            char message[100];
+            while(SDLNet_TCP_Recv(client,message,100))
                 std::cout << message;
+            SDLNet_TCP_Close(client);
             SDLNet_TCP_Close(server);
 
             SDLNet_Quit();
@@ -554,23 +555,23 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         if (!messageSent && !isServer)
         {
             messageSent = true;
-                IPaddress ip;
-                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+            IPaddress ip;
+            SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
 
-                const char* message="hello server!\n";
+            const char* message="hello server!\n";
 
-                TCPsocket client=SDLNet_TCP_Open(&ip);
+            TCPsocket server=SDLNet_TCP_Open(&ip);
 
-                SDLNet_TCP_Send(client,message,strlen(message)+1);
+            SDLNet_TCP_Send(server,message,strlen(message)+1);
 
-                char text[10000];
+            char text[100];
 
-                while(SDLNet_TCP_Recv(client,text,10000))
-                    std::cout << text;
+            while(SDLNet_TCP_Recv(server,text,100))
+                std::cout << text;
 
-                SDLNet_TCP_Close(client);
+            SDLNet_TCP_Close(server);
 
-                SDLNet_Quit();
+            SDLNet_Quit();
         }
     }
 
@@ -586,8 +587,8 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-	paddle->lPosition = paddle->position;
-	Ogre::Vector3* paddleCoords = &paddle->position;
+    paddle->lPosition = paddle->position;
+    Ogre::Vector3* paddleCoords = &paddle->position;
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
     float xDiff = arg.state.X.rel;
@@ -612,9 +613,9 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
         paddleCoords->y = 0;
     }
 
-	paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle->dV = paddle->lPosition - paddle->position;
-	engine->updatePaddle(paddle);
+    paddle->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+    paddle->dV = paddle->lPosition - paddle->position;
+    engine->updatePaddle(paddle);
     if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);
