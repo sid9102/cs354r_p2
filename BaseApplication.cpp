@@ -305,6 +305,7 @@ bool BaseApplication::setup(void)
         printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(2);
     }
+    lastUpdate = -1;
     return true;
 };
 //---------------------------------------------------------------------------
@@ -414,7 +415,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-
+    updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -522,63 +523,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             Mix_ResumeMusic();
         }
     }
-    else if (arg.key == OIS::KC_Z)
-    {
-        if(isServer)
-        {
-            if(!connectionOpened)
-            {
-                IPaddress ip;
-                SDLNet_ResolveHost(&ip, NULL, 1234);
-                server = SDLNet_TCP_Open(&ip);
-            }
-            const char* text="HELLO CLIENT!\n";
-            while(1)
-            {
-                if(!connectionOpened)
-                {
-                    client=SDLNet_TCP_Accept(server);
-                    if(client)
-                    {
-                        connectionOpened = true;
-                    }
-                }
-                if(client)
-                {
-                    SDLNet_TCP_Send(client,text,strlen(text)+1);
-                    break;
-                }
-            }
-            char message[10000];
-            int bytes = 0;
-            bytes = SDLNet_TCP_Recv(client,message,10000);
-            std::cout << message;
-
-//            SDLNet_TCP_Close(client);
-//            SDLNet_TCP_Close(server);
-        }
-
-        if (!isServer)
-        {
-            if(!connectionOpened)
-            {
-                IPaddress ip;
-                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
-                server=SDLNet_TCP_Open(&ip);
-                connectionOpened = true;
-            }
-
-            const char* message="hello server!\n";
-            SDLNet_TCP_Send(server,message,strlen(message)+1);
-
-            char text[10000];
-
-            SDLNet_TCP_Recv(server,text,10000);
-            std::cout << text;
-
-//            SDLNet_TCP_Close(server);
-        }
-    }
+//    else if (arg.key == OIS::KC_Z)
 
     mCameraMan->injectKeyDown(arg);
     return true;
@@ -668,6 +613,79 @@ void BaseApplication::windowClosed(Ogre::RenderWindow* rw)
 
             OIS::InputManager::destroyInputSystem(mInputManager);
             mInputManager = 0;
+        }
+    }
+}
+
+clock_t getCurrentTime()
+{
+    return clock() / (CLOCKS_PER_SEC / 1000);
+}
+
+void BaseApplication::updateClient()
+{
+    bool update = false;
+    if(lastUpdate == -1) {
+        lastUpdate = getCurrentTime();
+        update = true;
+    } else{
+        update = getCurrentTime() - lastUpdate > 16;
+    }
+
+    if (update) {
+        if(isServer)
+        {
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, NULL, 1234);
+                server = SDLNet_TCP_Open(&ip);
+            }
+            const char* text="HELLO CLIENT!\n";
+            while(1)
+            {
+                if(!connectionOpened)
+                {
+                    client=SDLNet_TCP_Accept(server);
+                    if(client)
+                    {
+                        connectionOpened = true;
+                    }
+                }
+                if(client)
+                {
+                    SDLNet_TCP_Send(client,text,strlen(text)+1);
+                    break;
+                }
+            }
+            char message[10000];
+            int bytes = 0;
+            bytes = SDLNet_TCP_Recv(client,message,10000);
+            std::cout << message;
+
+            //            SDLNet_TCP_Close(client);
+            //            SDLNet_TCP_Close(server);
+        }
+
+        if (!isServer)
+        {
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+                server=SDLNet_TCP_Open(&ip);
+                connectionOpened = true;
+            }
+
+            const char* message="hello server!\n";
+            SDLNet_TCP_Send(server,message,strlen(message)+1);
+
+            char text[10000];
+
+            SDLNet_TCP_Recv(server,text,10000);
+            std::cout << text;
+
+            //            SDLNet_TCP_Close(server);
         }
     }
 }

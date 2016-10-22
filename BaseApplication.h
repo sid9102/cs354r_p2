@@ -30,6 +30,7 @@ http://www.ogre3d.org/wiki/
 #include <SDL_mixer.h>
 #include <vector>
 #include <SDL_net.h>
+#include<time.h>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #  include <OIS/OISEvents.h>
@@ -92,6 +93,7 @@ public:
     bool connectionOpened;
 	TCPsocket server;
 	TCPsocket client;
+    clock_t lastUpdate;
 
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
@@ -134,6 +136,7 @@ protected:
     virtual void createResourceListener(void);
     virtual void loadResources(void);
     virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    virtual void updateClient();
 
     virtual bool keyPressed(const OIS::KeyEvent &arg);
     virtual bool keyReleased(const OIS::KeyEvent &arg);
