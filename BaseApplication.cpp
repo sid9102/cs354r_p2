@@ -94,9 +94,12 @@ void BaseApplication::createCamera(void)
     mCamera = mSceneMgr->createCamera("PlayerCam");
 
     // Position it at 500 in Z direction
-    mCamera->setPosition(Ogre::Vector3(-740,250,0));
+		//Server
+    //mCamera->setPosition(Ogre::Vector3(-740,250,0));
+		//Client
+    mCamera->setPosition(Ogre::Vector3(740,250,0));
     // Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(1500,250,0));
+    mCamera->lookAt(Ogre::Vector3(-1500,250,0));
     mCamera->setNearClipDistance(5);
 
     mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller
@@ -506,13 +509,20 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-	paddle1->lPosition = paddle1->position;
-	Ogre::Vector3* paddleCoords = &paddle1->position;
+			//Server
+	//paddle1->lPosition = paddle1->position;
+	//Ogre::Vector3* paddleCoords = &paddle1->position;
+			//Client
+	paddle2->lPosition = paddle2->position;
+	Ogre::Vector3* paddleCoords = &paddle2->position;
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
     float xDiff = arg.state.X.rel;
     float yDiff = arg.state.Y.rel;
-    paddleCoords->z += xDiff;
+			//Server
+    //paddleCoords->z += xDiff;
+			//Client
+    paddleCoords->z -= xDiff;
     paddleCoords->y -= yDiff;
     if (paddleCoords->z > 250)
     {
@@ -531,10 +541,14 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     {
         paddleCoords->y = 0;
     }
-
-	paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+			//Server
+	/*paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 	paddle1->dV = paddle1->lPosition - paddle1->position;
-	engine->updatePaddle(paddle1);
+	engine->updatePaddle(paddle1);*/
+			//Client
+	paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+	paddle2->dV = paddle2->lPosition - paddle2->position;
+	engine->updatePaddle(paddle2);
     if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);

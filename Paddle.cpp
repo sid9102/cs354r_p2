@@ -26,7 +26,10 @@ void Paddle::setPos(int x, int y, int z) {
 
 void Paddle::buildPaddle() {
 	paddleNode = paddleManager->getRootSceneNode()->createChildSceneNode("paddleNode" + playerNum);
-	paddleEntity = paddleManager->createEntity("Paddle.mesh");
+	if(playerNum == 1)
+		paddleEntity = paddleManager->createEntity("bluePaddle.mesh");
+	else if(playerNum == 2)
+		paddleEntity = paddleManager->createEntity("pinkPaddle.mesh");
 	paddleNode->attachObject(paddleEntity);
 	paddleNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(-90));
 	paddleNode->rotate(Ogre::Vector3::UNIT_X, Ogre::Degree(90));
