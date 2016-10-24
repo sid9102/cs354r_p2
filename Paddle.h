@@ -14,7 +14,8 @@ public:
 	Ogre::Vector3 dV;
 	Ogre::Vector3 dim;
 	Paddle(Ogre::SceneManager *newManager);
-	Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos);
+	Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos, int num);
+	int playerNum;
 	void setPos(int x, int y, int z);
 	void setDim(int w, int l, int h);
 private:

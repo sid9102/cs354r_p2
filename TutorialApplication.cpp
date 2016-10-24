@@ -54,17 +54,11 @@ void TutorialApplication::createScene(void)
 	directionalLight->setDirection(Ogre::Vector3(0, -1, 1));
 
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
-	paddle = new Paddle(mSceneMgr, Ogre::Vector3(-200, 250, 0));
+	paddle1 = new Paddle(mSceneMgr, Ogre::Vector3(-300, 250, 0), 1);
+	paddle2 = new Paddle(mSceneMgr, Ogre::Vector3(300, 250, 0), 2);
 
 	balls.push_back(new Sphere(25, mSceneMgr));
-	blocks = LevelParser::parseLevel(blocks, mSceneMgr);
-//	blocks.push_back(new Block(mSceneMgr, Block::wood, 1));
-//	blocks.at(0)->setPosition(400, 200, 0);
-//	blocks.at(0)->setSize(50, 20, 20);
-//	blocks.push_back(new Block(mSceneMgr, Block::paper, 2));
-//	blocks.at(1)->setPosition(400, 400, 0);
-//	blocks.at(1)->setSize(50, 20, 20);
-	engine = new Physics(balls, blocks, emptyRoom, paddle);
+	engine = new Physics(balls, emptyRoom, paddle1, paddle2);
 }
 
 //---------------------------------------------------------------------------

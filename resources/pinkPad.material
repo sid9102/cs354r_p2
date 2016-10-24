@@ -1,17 +1,17 @@
-// Handle genrated by blender2ogre 0.6.0
+// pinkPad genrated by blender2ogre 0.6.0
 
-material Handle 
+material pinkPad 
 {
     receive_shadows on 
 
     technique
     {
-        pass Handle
+        pass pinkPad
         {
-            ambient 0.800000011920929 0.4601137340068817 0.0 0.3814432621002197
-            diffuse 0.800000011920929 0.4601137340068817 0.0 0.3814432621002197
-            specular 0.0 0.0 0.0 0.3814432621002197 12.5
-            emissive 0.0 0.0 0.0 0.3814432621002197
+            ambient 0.800000011920929 0.05234351381659508 0.6491141319274902 0.4020618796348572
+            diffuse 0.6400000190734865 0.04187481167725937 0.5192913132800356 0.4020618796348572
+            specular 0.4845360815525055 0.4845360815525055 0.4845360815525055 0.4020618796348572 12.5
+            emissive 0.0 0.0 0.0 0.4020618796348572
 
             alpha_to_coverage off
             colour_write on

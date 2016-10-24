@@ -99,9 +99,9 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
-	std::vector<Block*> blocks;
 	Physics* engine;
-	Paddle* paddle;
+	Paddle* paddle1;
+	Paddle* paddle2;
 	double lastTime = time(0);
 	double newTime = 0.0;
 	double t = 0.0;
@@ -118,8 +118,9 @@ public:
     Mix_Chunk* paper_sound;
     Mix_Music* bgm;
 
-    // Enum
-    enum Type { paper, wood, stone, brick, metal };
+    int p1lives = 10;
+    int p2lives = 10;
+    int lastHit = 0;
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 
