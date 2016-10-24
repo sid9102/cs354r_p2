@@ -641,7 +641,10 @@ void BaseApplication::updateClient()
                 SDLNet_ResolveHost(&ip, NULL, 1234);
                 server = SDLNet_TCP_Open(&ip);
             }
-            const char* text="HELLO CLIENT!\n";
+
+            char sendBuffer[100];
+            float sendCoords[2] = {200, 100};
+
             while(1)
             {
                 if(!connectionOpened)
@@ -654,14 +657,16 @@ void BaseApplication::updateClient()
                 }
                 if(client)
                 {
-                    SDLNet_TCP_Send(client,text,strlen(text)+1);
+                    memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
+                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2);
                     break;
                 }
             }
-            char message[10000];
-            int bytes = 0;
-            bytes = SDLNet_TCP_Recv(client,message,10000);
-            std::cout << message;
+            char recvBuffer[100];
+            SDLNet_TCP_Recv(client,recvBuffer,100);
+            float recvdCoords[2];
+            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
+            printf("%f, %f\n", recvdCoords[0], recvdCoords[1]);
 
             //            SDLNet_TCP_Close(client);
             //            SDLNet_TCP_Close(server);
@@ -669,6 +674,7 @@ void BaseApplication::updateClient()
 
         if (!isServer)
         {
+
             if(!connectionOpened)
             {
                 IPaddress ip;
@@ -676,14 +682,16 @@ void BaseApplication::updateClient()
                 server=SDLNet_TCP_Open(&ip);
                 connectionOpened = true;
             }
+            char sendBuffer[100];
+            float sendCoords[2] = {200, 100};
+            memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
+            SDLNet_TCP_Send(server,sendBuffer,sizeof(float)*2);
 
-            const char* message="hello server!\n";
-            SDLNet_TCP_Send(server,message,strlen(message)+1);
-
-            char text[10000];
-
-            SDLNet_TCP_Recv(server,text,10000);
-            std::cout << text;
+            char recvBuffer[100];
+            SDLNet_TCP_Recv(server,recvBuffer,100);
+            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
+            float recvdCoords[2];
+            printf("%f, %f\n", recvdCoords[0], recvdCoords[1]);
 
             //            SDLNet_TCP_Close(server);
         }
