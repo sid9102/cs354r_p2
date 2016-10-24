@@ -710,7 +710,7 @@ void BaseApplication::updateClient()
             if(!connectionOpened)
             {
                 IPaddress ip;
-                SDLNet_ResolveHost(&ip, IPAddress, 1234);
+                SDLNet_ResolveHost(&ip, IPAddress.c_str(), 1234);
                 server=SDLNet_TCP_Open(&ip);
                 connectionOpened = true;
             }
