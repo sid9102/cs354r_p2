@@ -318,10 +318,11 @@ bool BaseApplication::setup(void)
     if(!isServer)
     {
         std::ifstream myfile("ServerIP.txt");
-        while ( getline (myfile,IPAddress) )
-        {
-            cout << IPAddress << '\n';
-        }
+        getline (myfile,IPAddress);
+        myfile.close();
+        printf("GOT IP ADDRESS OF SERVER: ");
+        printf(IPAddress.c_str());
+        printf("\n");
     }
 
     lastUpdate = -1;
