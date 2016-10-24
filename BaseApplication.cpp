@@ -91,14 +91,23 @@ void BaseApplication::createCamera(void)
 {
     // Create the camera
     mCamera = mSceneMgr->createCamera("PlayerCam");
-
     // Position it at 500 in Z direction
-		//Server
-    //mCamera->setPosition(Ogre::Vector3(-740,250,0));
-		//Client
-    mCamera->setPosition(Ogre::Vector3(740,250,0));
+    if (isServer){
+        //Server
+        mCamera->setPosition(Ogre::Vector3(-740,250,0));
+    }
+    else{
+        //Client
+        mCamera->setPosition(Ogre::Vector3(740,250,0));
+    }
     // Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+    if(isServer){
+        mCamera->lookAt(Ogre::Vector3(1500,250,0));
+    }
+    else{
+        mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+    }
+
     mCamera->setNearClipDistance(5);
 
     mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller
@@ -253,7 +262,7 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = true;
+    isServer = false;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
@@ -384,7 +393,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 			p2lives--;
 		}
 	}
-    
+
 	/*/
 	newTime = time(0);
 	frameTime = newTime - currentTime;
@@ -396,7 +405,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-    updateClient();
+//    updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -518,21 +527,34 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-			//Server
-	//paddle1->lPosition = paddle1->position;
-	//Ogre::Vector3* paddleCoords = &paddle1->position;
-			//Client
-	paddle2->lPosition = paddle2->position;
-	Ogre::Vector3* paddleCoords = &paddle2->position;
+    Ogre::Vector3* paddleCoords;
+
+    if(isServer){
+        //Server
+        paddle1->lPosition = paddle1->position;
+        paddleCoords = &paddle1->position;
+    }
+    else{
+        //Client
+        paddle2->lPosition = paddle2->position;
+        paddleCoords = &paddle2->position;
+    }
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
     float xDiff = arg.state.X.rel;
     float yDiff = arg.state.Y.rel;
-			//Server
-    //paddleCoords->z += xDiff;
-			//Client
-    paddleCoords->z -= xDiff;
-    paddleCoords->y -= yDiff;
+
+    if(isServer){
+        //Server
+        paddleCoords->z += xDiff;
+        paddleCoords->y -= yDiff; // Was left out for some reason?
+    }
+    else{
+        //Client
+        paddleCoords->z -= xDiff;
+        paddleCoords->y -= yDiff;
+    }
+
     if (paddleCoords->z > 250)
     {
         paddleCoords->z = 250;
@@ -550,14 +572,19 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     {
         paddleCoords->y = 0;
     }
-			//Server
-	/*paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle1->dV = paddle1->lPosition - paddle1->position;
-	engine->updatePaddle(paddle1);*/
-			//Client
-	paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle2->dV = paddle2->lPosition - paddle2->position;
-	engine->updatePaddle(paddle2);
+
+    if(isServer){
+        //Server
+        paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+        paddle1->dV = paddle1->lPosition - paddle1->position;
+        engine->updatePaddle(paddle1);
+    }
+    else{
+        //Client
+        paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+        paddle2->dV = paddle2->lPosition - paddle2->position;
+        engine->updatePaddle(paddle2);
+    }
     if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);
@@ -635,6 +662,9 @@ void BaseApplication::updateClient()
             }
 
             char sendBuffer[100];
+            // Need to send our paddle's position, paddle1
+//            float sendCoords[2];
+
             float sendCoords[2] = {200, 100};
 
             while(1)
@@ -681,8 +711,8 @@ void BaseApplication::updateClient()
 
             char recvBuffer[100];
             SDLNet_TCP_Recv(server,recvBuffer,100);
-            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
             float recvdCoords[2];
+            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
             printf("%f, %f\n", recvdCoords[0], recvdCoords[1]);
 
             //            SDLNet_TCP_Close(server);
