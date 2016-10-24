@@ -262,7 +262,7 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = false;
+    isServer = true;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
@@ -405,7 +405,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-//    updateClient();
+    updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -662,10 +662,8 @@ void BaseApplication::updateClient()
             }
 
             char sendBuffer[100];
-            // Need to send our paddle's position, paddle1
-//            float sendCoords[2];
-
-            float sendCoords[2] = {200, 100};
+            Ogre::Vector3* paddleCoords = &paddle1->position;
+            float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
 
             while(1)
             {
@@ -688,7 +686,10 @@ void BaseApplication::updateClient()
             SDLNet_TCP_Recv(client,recvBuffer,100);
             float recvdCoords[2];
             memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
-            printf("%f, %f\n", recvdCoords[0], recvdCoords[1]);
+            paddleCoords = &paddle2->position;
+            paddleCoords->y = recvdCoords[0];
+            paddleCoords->z = recvdCoords[1];
+            paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
             //            SDLNet_TCP_Close(client);
             //            SDLNet_TCP_Close(server);
@@ -705,7 +706,8 @@ void BaseApplication::updateClient()
                 connectionOpened = true;
             }
             char sendBuffer[100];
-            float sendCoords[2] = {200, 100};
+            Ogre::Vector3* paddleCoords = &paddle2->position;
+            float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
             memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
             SDLNet_TCP_Send(server,sendBuffer,sizeof(float)*2);
 
@@ -713,7 +715,10 @@ void BaseApplication::updateClient()
             SDLNet_TCP_Recv(server,recvBuffer,100);
             float recvdCoords[2];
             memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
-            printf("%f, %f\n", recvdCoords[0], recvdCoords[1]);
+            paddleCoords = &paddle1->position;
+            paddleCoords->y = recvdCoords[0];
+            paddleCoords->z = recvdCoords[1];
+            paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
             //            SDLNet_TCP_Close(server);
         }
