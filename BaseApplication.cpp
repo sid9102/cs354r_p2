@@ -315,6 +315,15 @@ bool BaseApplication::setup(void)
         printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(2);
     }
+    if(!isServer)
+    {
+        std::ifstream myfile("ServerIP.txt");
+        if (myfile.is_open()) {
+            getline(myfile, IPAddress);
+            myfile.close();
+        }
+    }
+
     lastUpdate = -1;
     return true;
 };
@@ -701,7 +710,7 @@ void BaseApplication::updateClient()
             if(!connectionOpened)
             {
                 IPaddress ip;
-                SDLNet_ResolveHost(&ip, "128.83.144.233", 1234);
+                SDLNet_ResolveHost(&ip, IPAddress, 1234);
                 server=SDLNet_TCP_Open(&ip);
                 connectionOpened = true;
             }

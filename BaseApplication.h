@@ -31,6 +31,8 @@ http://www.ogre3d.org/wiki/
 #include <vector>
 #include <SDL_net.h>
 #include<time.h>
+#include <iostream>
+#include <fstream>
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #  include <OIS/OISEvents.h>
@@ -88,12 +90,13 @@ public:
     virtual ~BaseApplication(void);
     virtual void go(void);
 
-	// Socket shit
+	// Socket stuff
     bool isServer;
     bool connectionOpened;
 	TCPsocket server;
 	TCPsocket client;
     clock_t lastUpdate;
+    std::string IPAddress;
 
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
