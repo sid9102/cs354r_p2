@@ -318,9 +318,9 @@ bool BaseApplication::setup(void)
     if(!isServer)
     {
         std::ifstream myfile("ServerIP.txt");
-        if (myfile.is_open()) {
-            getline(myfile, IPAddress);
-            myfile.close();
+        while ( getline (myfile,IPAddress) )
+        {
+            cout << IPAddress << '\n';
         }
     }
 
