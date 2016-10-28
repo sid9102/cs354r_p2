@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 noinst_HEADERS = BaseApplication.h Room.h Sphere.h TutorialApplication.h Physics.h Paddle.h LevelParser.h Block.h
 bin_PROGRAMS = assignment3
 assignment3_CPPFLAGS = -I$(top_srcdir)

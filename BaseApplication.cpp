@@ -22,21 +22,21 @@ http://www.ogre3d.org/wiki/
 #endif
 //---------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
-    : mRoot(0),
-    mCamera(0),
-    mSceneMgr(0),
-    mWindow(0),
-    mResourcesCfg(Ogre::StringUtil::BLANK),
-    mPluginsCfg(Ogre::StringUtil::BLANK),
-    mTrayMgr(0),
-    mCameraMan(0),
-    mDetailsPanel(0),
-    mCursorWasVisible(false),
-    mShutDown(false),
-    mInputManager(0),
-    mMouse(0),
-    mKeyboard(0),
-    mOverlaySystem(0)
+        : mRoot(0),
+          mCamera(0),
+          mSceneMgr(0),
+          mWindow(0),
+          mResourcesCfg(Ogre::StringUtil::BLANK),
+          mPluginsCfg(Ogre::StringUtil::BLANK),
+          mTrayMgr(0),
+          mCameraMan(0),
+          mDetailsPanel(0),
+          mCursorWasVisible(false),
+          mShutDown(false),
+          mInputManager(0),
+          mMouse(0),
+          mKeyboard(0),
+          mOverlaySystem(0)
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
     m_ResourcePath = Ogre::macBundlePath() + "/Contents/Resources/";
@@ -68,8 +68,7 @@ bool BaseApplication::configure(void)
     {
         // If returned true, user clicked OK so initialise.
         // Here we choose to let the system create a default rendering window by passing 'true'.
-        mWindow = mRoot->initialise(true, "TutorialApplication Render Window");
-		mWindow->setFullscreen(true, 1920, 1200);
+        mWindow = mRoot->initialise(true, "Paddlemania");
         return true;
     }
     else
@@ -92,14 +91,23 @@ void BaseApplication::createCamera(void)
 {
     // Create the camera
     mCamera = mSceneMgr->createCamera("PlayerCam");
-
     // Position it at 500 in Z direction
-		//Server
-    //mCamera->setPosition(Ogre::Vector3(-740,250,0));
-		//Client
-    mCamera->setPosition(Ogre::Vector3(740,250,0));
+    if (isServer){
+        //Server
+        mCamera->setPosition(Ogre::Vector3(-740,250,0));
+    }
+    else{
+        //Client
+        mCamera->setPosition(Ogre::Vector3(740,250,0));
+    }
     // Look back along -Z
-    mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+    if(isServer){
+        mCamera->lookAt(Ogre::Vector3(1500,250,0));
+    }
+    else{
+        mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+    }
+
     mCamera->setNearClipDistance(5);
 
     mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller
@@ -133,8 +141,8 @@ void BaseApplication::createFrameListener(void)
     mInputContext.mKeyboard = mKeyboard;
     mInputContext.mMouse = mMouse;
     mTrayMgr = new OgreBites::SdkTrayManager("InterfaceName", mWindow, mInputContext, this);
-	mTrayMgr->hideFrameStats();
-	mTrayMgr->hideLogo();
+    mTrayMgr->hideFrameStats();
+    mTrayMgr->hideLogo();
     mTrayMgr->hideCursor();
 
     // Create a params panel for displaying sample details
@@ -162,7 +170,7 @@ void BaseApplication::createFrameListener(void)
 
     //mWinBox = mTrayMgr->createTextBox(OgreBites::TL_CENTER,"WinCap","Game Over", 100, 50);
     //mWinBox->hide();
-	
+
     mRoot->addFrameListener(this);
 }
 //---------------------------------------------------------------------------
@@ -209,7 +217,7 @@ void BaseApplication::setupResources(void)
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                archName, typeName, secName);
+                    archName, typeName, secName);
         }
     }
 }
@@ -226,7 +234,7 @@ void BaseApplication::loadResources(void)
 void BaseApplication::go(void)
 {
 #ifdef _DEBUG
-#ifndef OGRE_STATIC_LIB
+    #ifndef OGRE_STATIC_LIB
     mResourcesCfg = m_ResourcePath + "resources_d.cfg";
     mPluginsCfg = m_ResourcePath + "plugins_d.cfg";
 #else
@@ -254,6 +262,8 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
+    isServer = true;
+    connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
     setupResources();
@@ -279,7 +289,7 @@ bool BaseApplication::setup(void)
     createFrameListener();
 
     // Initialize the SDL_Mixer
-    SDL_Init(SDL_INIT_AUDIO);
+    SDL_Init(SDL_INIT_EVERYTHING);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     bgm = Mix_LoadMUS("resources/bgm.wav");
     explosion = Mix_LoadWAV("resources/Explosion.wav");
@@ -299,6 +309,23 @@ bool BaseApplication::setup(void)
         Mix_PauseMusic();
     }
 
+
+    if(SDLNet_Init()==-1)
+    {
+        printf("SDLNet_Init: %s\n", SDLNet_GetError());
+        exit(2);
+    }
+    if(!isServer)
+    {
+        std::ifstream myfile("ServerIP.txt");
+        getline (myfile,IPAddress);
+        myfile.close();
+        printf("GOT IP ADDRESS OF SERVER: ");
+        printf(IPAddress.c_str());
+        printf("\n");
+    }
+
+    lastUpdate = -1;
     return true;
 };
 //---------------------------------------------------------------------------
@@ -336,29 +363,29 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
             mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
             mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
             mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-			*/
+            */
         }
     }
-	/*
-	for (int i = 0; i < NUM_SPHERE; i++) {
+    /*
+    for (int i = 0; i < NUM_SPHERE; i++) {
 
-		ball[i]->update();
-		emptyRoom->checkCollide(ball[i]);
-		for (int j = i + 1; j < NUM_SPHERE; j++) {
-			emptyRoom->checkCollide(ball[i], ball[j]);
-		}
-	}
-	*/
+        ball[i]->update();
+        emptyRoom->checkCollide(ball[i]);
+        for (int j = i + 1; j < NUM_SPHERE; j++) {
+            emptyRoom->checkCollide(ball[i], ball[j]);
+        }
+    }
+    */
 
-	btTransform trans;
-	int len = balls.size();
-	int index;
+    btTransform trans;
+    int len = balls.size();
+    int index;
 
-	for (int i = 0; i < len; i++) {
-		engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
-		balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-		balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
-	}
+    for (int i = 0; i < len; i++) {
+        engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+        balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+        balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
+    }
 
 	engine->update(evt.timeSinceLastFrame, 100);
 	lastHit++;
@@ -399,19 +426,19 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 			p2lives--;
 		}
 	}
-    
+
 	/*/
 	newTime = time(0);
 	frameTime = newTime - currentTime;
 	currentTime = time(0);
 
-	while (frameTime >= 0) {
+    while (frameTime >= 0) {
 
-		frameTime -= dt;
-	}*/
-	//ball->update();
-	//emptyRoom->checkCollide(ball);
-    
+        frameTime -= dt;
+    }*/
+    //ball->update();
+    //emptyRoom->checkCollide(ball);
+    updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -441,7 +468,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::String newVal;
         Ogre::TextureFilterOptions tfo;
         unsigned int aniso;
-		/*
+        /*
         switch (mDetailsPanel->getParamValue(9).asUTF8()[0])
         {
         case 'B':
@@ -468,7 +495,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
         Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(tfo);
         Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
         mDetailsPanel->setParamValue(9, newVal);
-		*/
+        */
     }
     else if (arg.key == OIS::KC_R)   // cycle polygon rendering mode
     {
@@ -477,17 +504,17 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 
         switch (mCamera->getPolygonMode())
         {
-        case Ogre::PM_SOLID:
-            newVal = "Wireframe";
-            pm = Ogre::PM_WIREFRAME;
-            break;
-        case Ogre::PM_WIREFRAME:
-            newVal = "Points";
-            pm = Ogre::PM_POINTS;
-            break;
-        default:
-            newVal = "Solid";
-            pm = Ogre::PM_SOLID;
+            case Ogre::PM_SOLID:
+                newVal = "Wireframe";
+                pm = Ogre::PM_WIREFRAME;
+                break;
+            case Ogre::PM_WIREFRAME:
+                newVal = "Points";
+                pm = Ogre::PM_POINTS;
+                break;
+            default:
+                newVal = "Solid";
+                pm = Ogre::PM_SOLID;
         }
 
         mCamera->setPolygonMode(pm);
@@ -519,6 +546,7 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
             Mix_ResumeMusic();
         }
     }
+//    else if (arg.key == OIS::KC_Z)
 
     mCameraMan->injectKeyDown(arg);
     return true;
@@ -532,21 +560,34 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-			//Server
-	//paddle1->lPosition = paddle1->position;
-	//Ogre::Vector3* paddleCoords = &paddle1->position;
-			//Client
-	paddle2->lPosition = paddle2->position;
-	Ogre::Vector3* paddleCoords = &paddle2->position;
+    Ogre::Vector3* paddleCoords;
+
+    if(isServer){
+        //Server
+        paddle1->lPosition = paddle1->position;
+        paddleCoords = &paddle1->position;
+    }
+    else{
+        //Client
+        paddle2->lPosition = paddle2->position;
+        paddleCoords = &paddle2->position;
+    }
     if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
     float xDiff = arg.state.X.rel;
     float yDiff = arg.state.Y.rel;
-			//Server
-    //paddleCoords->z += xDiff;
-			//Client
-    paddleCoords->z -= xDiff;
-    paddleCoords->y -= yDiff;
+
+    if(isServer){
+        //Server
+        paddleCoords->z += xDiff;
+        paddleCoords->y -= yDiff; // Was left out for some reason?
+    }
+    else{
+        //Client
+        paddleCoords->z -= xDiff;
+        paddleCoords->y -= yDiff;
+    }
+
     if (paddleCoords->z > 250)
     {
         paddleCoords->z = 250;
@@ -564,14 +605,19 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     {
         paddleCoords->y = 0;
     }
-			//Server
-	/*paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle1->dV = paddle1->lPosition - paddle1->position;
-	engine->updatePaddle(paddle1);*/
-			//Client
-	paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-	paddle2->dV = paddle2->lPosition - paddle2->position;
-	engine->updatePaddle(paddle2);
+
+    if(isServer){
+        //Server
+        paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+        paddle1->dV = paddle1->lPosition - paddle1->position;
+        engine->updatePaddle(paddle1);
+    }
+    else{
+        //Client
+        paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+        paddle2->dV = paddle2->lPosition - paddle2->position;
+        engine->updatePaddle(paddle2);
+    }
     if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
     {
         Mix_PlayChannel(-1, woosh, 0);
@@ -619,6 +665,95 @@ void BaseApplication::windowClosed(Ogre::RenderWindow* rw)
 
             OIS::InputManager::destroyInputSystem(mInputManager);
             mInputManager = 0;
+        }
+    }
+}
+
+clock_t getCurrentTime()
+{
+    return clock() / (CLOCKS_PER_SEC / 1000);
+}
+
+void BaseApplication::updateClient()
+{
+    bool update = false;
+    if(lastUpdate == -1) {
+        lastUpdate = getCurrentTime();
+        update = true;
+    } else{
+        update = getCurrentTime() - lastUpdate > 16;
+    }
+
+    if (update) {
+        if(isServer)
+        {
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, NULL, 1234);
+                server = SDLNet_TCP_Open(&ip);
+            }
+
+            char sendBuffer[100];
+            Ogre::Vector3* paddleCoords = &paddle1->position;
+            float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
+
+            while(1)
+            {
+                if(!connectionOpened)
+                {
+                    client=SDLNet_TCP_Accept(server);
+                    if(client)
+                    {
+                        connectionOpened = true;
+                    }
+                }
+                if(client)
+                {
+                    memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
+                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2);
+                    break;
+                }
+            }
+            char recvBuffer[100];
+            SDLNet_TCP_Recv(client,recvBuffer,100);
+            float recvdCoords[2];
+            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
+            paddleCoords = &paddle2->position;
+            paddleCoords->y = recvdCoords[0];
+            paddleCoords->z = recvdCoords[1];
+            paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+
+            //            SDLNet_TCP_Close(client);
+            //            SDLNet_TCP_Close(server);
+        }
+
+        if (!isServer)
+        {
+
+            if(!connectionOpened)
+            {
+                IPaddress ip;
+                SDLNet_ResolveHost(&ip, IPAddress.c_str(), 1234);
+                server=SDLNet_TCP_Open(&ip);
+                connectionOpened = true;
+            }
+            char sendBuffer[100];
+            Ogre::Vector3* paddleCoords = &paddle2->position;
+            float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
+            memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
+            SDLNet_TCP_Send(server,sendBuffer,sizeof(float)*2);
+
+            char recvBuffer[100];
+            SDLNet_TCP_Recv(server,recvBuffer,100);
+            float recvdCoords[2];
+            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
+            paddleCoords = &paddle1->position;
+            paddleCoords->y = recvdCoords[0];
+            paddleCoords->z = recvdCoords[1];
+            paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+
+            //            SDLNet_TCP_Close(server);
         }
     }
 }
