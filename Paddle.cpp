@@ -1,5 +1,7 @@
 #include "Paddle.h"
 
+Paddle::Paddle() {
+}
 Paddle::Paddle(Ogre::SceneManager *newManager) {
 	paddleManager = newManager;
 	dim = Ogre::Vector3(80, 12, 120);

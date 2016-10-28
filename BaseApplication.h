@@ -111,6 +111,7 @@ public:
 	double t = 0.0;
 	double dt = 1 / 60.0;
 	int score = 0;
+	bool multiplayer;
 
 	// Sounds
     bool soundOn = true;

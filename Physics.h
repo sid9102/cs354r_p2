@@ -25,7 +25,7 @@ public:
 	btRigidBody*			paddleRigidBody2;// Holds the pointer to the hit area for the paddle2
 
 	// Constructor and deconstructor declared here
-	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2);
+	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2, bool multi);
 	~Physics();
 
 	int checkCollide(Paddle* &pad1, Paddle* &pad2, std::vector<Block*> &blk); // Check for collisions between specific objects
@@ -35,6 +35,7 @@ public:
 	// Sounds
 	Mix_Chunk* bounce;
 	bool soundOn = true;
+	bool multiplayer;
 private:
 	// Basic Physics Variables
 	btBroadphaseInterface* broadphase;

@@ -147,8 +147,14 @@ void BaseApplication::createFrameListener(void)
 
     // Create a params panel for displaying sample details
     Ogre::StringVector items;
-    items.push_back("Player 1 Lives: ");
-    items.push_back("Player 2 Lives: ");
+    if(multiplayer) {
+        items.push_back("Player 1 Lives: ");
+        items.push_back("Player 2 Lives: ");
+    }
+    else {
+        items.push_back("Lives");
+        items.push_back("Score");
+    }
 	/*
     items.push_back("cam.pX");
     items.push_back("cam.pY");
@@ -354,7 +360,10 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
 		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
-		mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
+		if(multiplayer)
+			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
+		else 
+			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score)); 	
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
@@ -420,7 +429,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 			p1lives--;
 		}
 	}
-	else if (index == -10) {
+	else if (index == -10 && multiplayer) {
 		if(lastHit>15) {
 			lastHit = 0;
 			p2lives--;
@@ -438,7 +447,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-    updateClient();
+    //updateClient();
     return true;
 }
 //---------------------------------------------------------------------------

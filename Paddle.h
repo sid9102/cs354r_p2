@@ -13,6 +13,7 @@ public:
 	Ogre::Vector3 lPosition;
 	Ogre::Vector3 dV;
 	Ogre::Vector3 dim;
+	Paddle();
 	Paddle(Ogre::SceneManager *newManager);
 	Paddle(Ogre::SceneManager *newManager, Ogre::Vector3 nPos, int num);
 	int playerNum;

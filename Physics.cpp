@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2) {
+Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2, bool multi) {
 	// Helps eliminate pairs of object that should not collide
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -92,6 +92,7 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 
 	// Set mass and motion for the ball
 	// NOTE: The btVector 3 here is the starting position for the ball
+	multiplayer = multi;
 	ballMass = 1;
 	blockMass = 0;
 	paddleMass = 0;
@@ -130,15 +131,17 @@ Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &
 	dynamicsWorld->addRigidBody(paddleRigidBody1);
 
 	//Paddle 2
-	paddleMotionState2 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad2->position.x, pad2->position.y, pad2->position.z)));
-	btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI2(paddleMass, paddleMotionState2, paddleShape, paddleInertia);
-	paddleRigidBody2 = new btRigidBody(paddleRigidBodyCI2);
-	paddleRigidBody2->setUserPointer(paddleRigidBody2);
-	userIndex[paddleRigidBody2->getUserPointer()] = 16000;
-	paddleRigidBody2->setRestitution(0.0);
-	paddleRigidBody2->setFriction(1.0);
-	paddleRigidBody2->setRollingFriction(1.0);
-	dynamicsWorld->addRigidBody(paddleRigidBody2);
+	if(multiplayer) {
+		paddleMotionState2 = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(pad2->position.x, pad2->position.y, pad2->position.z)));
+		btRigidBody::btRigidBodyConstructionInfo paddleRigidBodyCI2(paddleMass, paddleMotionState2, paddleShape, paddleInertia);
+		paddleRigidBody2 = new btRigidBody(paddleRigidBodyCI2);
+		paddleRigidBody2->setUserPointer(paddleRigidBody2);
+		userIndex[paddleRigidBody2->getUserPointer()] = 16000;
+		paddleRigidBody2->setRestitution(0.0);
+		paddleRigidBody2->setFriction(1.0);
+		paddleRigidBody2->setRollingFriction(1.0);
+		dynamicsWorld->addRigidBody(paddleRigidBody2);
+	}
 	
 	len = blocks.size();
 	for(int j = 0; j < len; j++) {
@@ -200,11 +203,12 @@ int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2, std::vector<Block*> &blk
 				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 8000) {
 					if (userIndex[obB->getUserPointer()] == 8000 || userIndex[obB->getUserPointer()] == 1000) {
 						//ballRigidBody.at(0)->setLinearVelocity(btVector3(200, pad1->dV.y, pad1->dV.z));
-						dynamicsWorld->setGravity(btVector3(300, 0, 0));
+						if(multiplayer)
+							dynamicsWorld->setGravity(btVector3(300, 0, 0));
 					}
 				}
 				//p2 paddle + ball
-				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 16000) {
+				if (multiplayer && (userIndex[obA->getUserPointer()] == 1000 || userIndex[obA->getUserPointer()] == 16000)) {
 					if (userIndex[obB->getUserPointer()] == 16000 || userIndex[obB->getUserPointer()] == 1000) {
 						//ballRigidBody.at(0)->setLinearVelocity(btVector3(-200, pad2->dV.y, pad2->dV.z));
 						dynamicsWorld->setGravity(btVector3(-300, 0, 0));
