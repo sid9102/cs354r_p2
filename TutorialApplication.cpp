@@ -58,7 +58,8 @@ void TutorialApplication::createScene(void)
 	paddle2 = new Paddle(mSceneMgr, Ogre::Vector3(300, 250, 0), 2);
 
 	balls.push_back(new Sphere(25, mSceneMgr));
-	engine = new Physics(balls, emptyRoom, paddle1, paddle2);
+	blocks = LevelParser::parseLevel(blocks,mSceneMgr);
+	engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2);
 }
 
 //---------------------------------------------------------------------------

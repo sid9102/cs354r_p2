@@ -89,6 +89,7 @@ public:
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;
 	std::vector<Sphere*> balls;
+	std::vector<Block*> blocks;
 	Physics* engine;
 	Paddle* paddle1;
 	Paddle* paddle2;
@@ -96,6 +97,7 @@ public:
 	double newTime = 0.0;
 	double t = 0.0;
 	double dt = 1 / 60.0;
+	int score = 0;
 
 	// Sounds
     bool soundOn = true;
@@ -107,6 +109,8 @@ public:
     Mix_Chunk* wood_sound;
     Mix_Chunk* paper_sound;
     Mix_Music* bgm;
+
+    enum Type { paper, wood, stone, brick, metal };
 
     int p1lives = 10;
     int p2lives = 10;

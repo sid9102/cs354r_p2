@@ -1,6 +1,6 @@
 #include "Physics.h"
 
-Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad1, Paddle* &pad2) {
+Physics::Physics(std::vector<Sphere*> balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2) {
 	// Helps eliminate pairs of object that should not collide
 	broadphase = new btDbvtBroadphase();
 	collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -20,6 +20,11 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad1, Paddle
 	int len = balls.size();
 	for(int i = 0; i < len; i++)
 		ballShape.push_back(new btSphereShape(balls.at(i)->radius));
+
+	//Create Blocks
+	len = blocks.size();
+	for (int i = 0; i < len; i++)
+		blockShape.push_back(new btBoxShape(btVector3(blocks.at(i)->width/2, blocks.at(i)->length/2, blocks.at(i)->height/2)));
 
 	paddleShape = new btCapsuleShapeX(pad1->dim.x, 4);
 
@@ -88,8 +93,10 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad1, Paddle
 	// Set mass and motion for the ball
 	// NOTE: The btVector 3 here is the starting position for the ball
 	ballMass = 1;
+	blockMass = 0;
 	paddleMass = 0;
 	ballInertia = btVector3(0, 0, 0);
+	blockInertia = btVector3(0, 0, 0);
 	paddleInertia = btVector3(0, 0, 0);
 
 	len = balls.size();
@@ -132,13 +139,32 @@ Physics::Physics(std::vector<Sphere*> balls, Room* &space, Paddle* &pad1, Paddle
 	paddleRigidBody2->setFriction(1.0);
 	paddleRigidBody2->setRollingFriction(1.0);
 	dynamicsWorld->addRigidBody(paddleRigidBody2);
+	
+	len = blocks.size();
+	for(int j = 0; j < len; j++) {
+		blockShape.at(j)->calculateLocalInertia(blockMass, blockInertia);
+		blockMotionState.push_back(new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(blocks.at(j)->getPosition().x, 
+																											blocks.at(j)->getPosition().y, 
+																											blocks.at(j)->getPosition().z))));
+		btRigidBody::btRigidBodyConstructionInfo blockRigidBodyCI(blockMass, blockMotionState.at(j), blockShape.at(j), blockInertia);
+		blockRigidBody.push_back(new btRigidBody(blockRigidBodyCI));
+
+		blockRigidBody.at(j)->setUserPointer(blockRigidBody.at(j));
+		userIndex[blockRigidBody.at(j)->getUserPointer()] = j+1;
+		paddleRigidBody1->setUserPointer(paddleShape);
+		blockRigidBody.at(j)->setFriction(1.0);
+		blockRigidBody.at(j)->setRollingFriction(1.0);
+		blockRigidBody.at(j)->setRestitution(.8);
+		dynamicsWorld->addRigidBody(blockRigidBody.at(j));
+	}
+
 
     SDL_Init(SDL_INIT_AUDIO);
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 2048);
     bounce = Mix_LoadWAV("resources/bounce.wav");
 }
 
-int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2) {
+int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2, std::vector<Block*> &blk) {
 	//Assume world->stepSimulation or world->performDiscreteCollisionDetection has been called
 	int numManifolds = dynamicsWorld->getDispatcher()->getNumManifolds();
 	for (int i = 0; i<numManifolds; i++)
@@ -182,6 +208,30 @@ int Physics::checkCollide(Paddle* &pad1, Paddle* &pad2) {
 					if (userIndex[obB->getUserPointer()] == 16000 || userIndex[obB->getUserPointer()] == 1000) {
 						//ballRigidBody.at(0)->setLinearVelocity(btVector3(-200, pad2->dV.y, pad2->dV.z));
 						dynamicsWorld->setGravity(btVector3(-300, 0, 0));
+					}
+				}
+				if (userIndex[obA->getUserPointer()] == 1000 || userIndex[obB->getUserPointer()] == 1000) {
+					if((userIndex[obA->getUserPointer()] < MAX_BLOCKS) && (userIndex[obA->getUserPointer()] >= 0)) {
+						int index = userIndex[obA->getUserPointer()];
+						if ((index - 1) >= 0) {
+							Block* hitBlock = blk.at(index - 1);
+							if (hitBlock->type != Block::metal && hitBlock->damage == (hitBlock->durability - 1)) {
+								userIndex[obA->getUserPointer()] = -1;
+								dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							}
+							return index;
+						}
+					}
+					else if((userIndex[obB->getUserPointer()] < MAX_BLOCKS) && (userIndex[obB->getUserPointer()] >= 0)) {
+						int index = userIndex[obB->getUserPointer()];
+						if ((index - 1) >= 0) {
+							Block* hitBlock = blk.at(index - 1);
+							if (hitBlock->type != Block::metal && hitBlock->damage == (hitBlock->durability - 1)) {
+								userIndex[obB->getUserPointer()] = -1;
+								dynamicsWorld->removeCollisionObject(blockRigidBody.at(index - 1));
+							}
+							return index;
+						}
 					}
 				}
 			}
@@ -254,6 +304,14 @@ Physics::~Physics() {
 		delete wallRigidBody.at(j);
 	}
 
+	len = blockShape.size();
+	for (int k = 0; k < len; k++) {
+		delete blockShape.at(k);
+		delete blockMotionState.at(k);
+		delete blockRigidBody.at(k);
+	}
+
 
 //	delete ballInertia;
+//  delete blockInertia;
 }

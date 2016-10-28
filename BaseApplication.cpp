@@ -362,7 +362,30 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 	engine->update(evt.timeSinceLastFrame, 100);
 	lastHit++;
-	index = engine->checkCollide(paddle1, paddle2);
+	index = engine->checkCollide(paddle1, paddle2, blocks);
+
+	if(index > 0) {
+		score += blocks.at(index-1) ->destroy();
+		if(soundOn) {
+			switch (blocks.at(index-1)->type) {
+			case paper:
+				Mix_PlayChannel(-1, paper_sound, 0);
+				break;
+			case wood:
+				Mix_PlayChannel(-1, wood_sound, 0);
+				break;
+			case stone:
+				Mix_PlayChannel(-1, stone_sound, 0);
+				break;
+			case brick:
+				Mix_PlayChannel(-1, brick_sound, 0);
+				break;
+			case metal:
+				Mix_PlayChannel(-1, metal_sound, 0);
+				break;
+			}
+		}
+	}
 
 	if (index == -5) {
 		if(lastHit>15) {

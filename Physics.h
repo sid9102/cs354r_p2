@@ -25,10 +25,10 @@ public:
 	btRigidBody*			paddleRigidBody2;// Holds the pointer to the hit area for the paddle2
 
 	// Constructor and deconstructor declared here
-	Physics(std::vector<Sphere*>balls, Room* &space, Paddle* &pad1, Paddle* &pad2);
+	Physics(std::vector<Sphere*>balls, std::vector<Block*> blocks, Room* &space, Paddle* &pad1, Paddle* &pad2);
 	~Physics();
 
-	int checkCollide(Paddle* &pad1, Paddle* &pad2); // Check for collisions between specific objects
+	int checkCollide(Paddle* &pad1, Paddle* &pad2, std::vector<Block*> &blk); // Check for collisions between specific objects
 	void update(double tStep, double rate);					  // Update the simulation (simulation step)
 	void updatePaddle(Paddle* &pad);						  // Update position of the paddle's hit area to match the paddle graphic
 
@@ -45,7 +45,8 @@ private:
 
 	// Dynamic Objects (blocks, balls, powerups, etc.)
 	std::vector<btCollisionShape*> ballShape; // mass = 1
-	btCollisionShape*			   paddleShape; // mass = 0;
+	std::vector<btCollisionShape*> blockShape; // mass = 0
+	btCollisionShape* paddleShape; // mass = 0;
 
 	// Static Objects (walls, ceiling, floor)
 	btCollisionShape* groundShape;
@@ -54,6 +55,7 @@ private:
 
 	// Motion states for objects
 	std::vector<btDefaultMotionState*> ballMotionState;
+	std::vector<btDefaultMotionState*> blockMotionState;
 	btDefaultMotionState* groundMotionState;
 	std::vector<btDefaultMotionState*> wallMotionState;
 	btDefaultMotionState* ceilMotionState;
@@ -67,8 +69,10 @@ private:
 
 	// SetUp Dynamic Objects
 	btScalar ballMass;
+	btScalar blockMass;
 	btScalar paddleMass;
 	btVector3 ballInertia;
+	btVector3 blockInertia;
 	btVector3 paddleInertia;
 };
 #endif // #ifndef __Physics_h_
