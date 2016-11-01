@@ -824,7 +824,11 @@ void BaseApplication::updateClient()
 //            trans.setRotation().setW(recvdBRot[3]);
 
 //            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
-//            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
+//            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);\
+
+            balls.at(0)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+            balls.at(0)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
+                                trans.getRotation().getW());
 
             paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
