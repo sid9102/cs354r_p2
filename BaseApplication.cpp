@@ -363,8 +363,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
 		if(multiplayer)
 			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
-		else 
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score)); 	
+		else
+			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
 			/*
             mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
             mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
@@ -448,7 +448,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-    //updateClient();
+    updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -686,6 +686,39 @@ clock_t getCurrentTime()
 
 void BaseApplication::updateClient()
 {
+    /* Changes needed:
+     * send information on the rotation of the sphere (in 4 doubles, 32 bytes)
+     * bringing us to  12 + (12 + 32) = 56 bytes = 448 bits */
+
+    /* Contains information of the rotation of the ball within "trans" */
+    btTransform = trans;
+    engine->ballRigidBody.at(0)->getMotionState()->getWorldTransform(trans);
+
+    /* Might need to get the position and rotation of the ball using
+    the get() functions */
+
+    // The "ints" may need to be "floats" instead, or cast
+    // 12 bytes
+    int bPosX = trans.getOrigin().getX();
+    int bPosY = trans.getOrigin().getY();
+    int bPosZ = trans.getOrigin().getZ();
+    // 32 bytes
+    double bRotX = trans.getRotation().getX();
+    double bRotY = trans.getRotation().getY();
+    double bRotZ = trans.getRotation().getZ();
+    double bRotW = trans.getRotation().getW();
+
+    // The "ints" may need to be "floats" instead, or cast
+    // 12 bytes
+    int bPosX = balls[0].getPos().x;
+    int bPosY = balls[0].getPos().y;
+    int bPosZ = balls[0].getPos().z;
+    // 32 bytes
+    double bRotX = balls[0].getRotation().x;
+    double bRotY = balls[0].getRotation().y;
+    double bRotZ = balls[0].getRotation().z;
+    double bRotW = balls[0].getRotation().w;
+
     bool update = false;
     if(lastUpdate == -1) {
         lastUpdate = getCurrentTime();
@@ -704,9 +737,13 @@ void BaseApplication::updateClient()
                 server = SDLNet_TCP_Open(&ip);
             }
 
-            char sendBuffer[100];
+            char sendBuffer[500];
             Ogre::Vector3* paddleCoords = &paddle1->position;
+
+            // Arrays preparing to use memcpy
             float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
+            int sendBPos[3] = {bPosX, bPosY, bPosZ};
+            double sendBRot[4] = {bRotX, bRotY, bRotZ, bRotW};
 
             while(1)
             {
@@ -720,14 +757,19 @@ void BaseApplication::updateClient()
                 }
                 if(client)
                 {
-                    memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
-                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2);
+                    // Memcpy functions (Arrays may need '&' symbol before them)
+                    memcpy(sendBuffer, &sendCoords, sizeof(float)*2); // <-- this one
+                    memcpy(&sendBuffer[sizeof(float)*2], &sendBPos, sizeof(int)*3);
+                    memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3], &sendBRot, sizeof(double)*4);
+                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4);
                     break;
                 }
             }
+
             char recvBuffer[100];
             SDLNet_TCP_Recv(client,recvBuffer,100);
             float recvdCoords[2];
+            // Need to also receive paddle collision info to render in physics engine
             memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
             paddleCoords = &paddle2->position;
             paddleCoords->y = recvdCoords[0];
@@ -754,13 +796,23 @@ void BaseApplication::updateClient()
             memcpy(sendBuffer, &sendCoords, sizeof(float)*2);
             SDLNet_TCP_Send(server,sendBuffer,sizeof(float)*2);
 
-            char recvBuffer[100];
-            SDLNet_TCP_Recv(server,recvBuffer,100);
+            char recvBuffer[500];
+            SDLNet_TCP_Recv(server,recvBuffer,500);
+
             float recvdCoords[2];
+            int recvdBPos[3];
+            double recvdBRot[4];
+
             memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
+            memcpy(&recvdBPos, recvBuffer[sizeof(float)*2], sizeof(int)*3);
+            memcpy(&recvdBRot, recvBuffer[sizeof(float)*2 + sizeof(int)*3], sizeof(double)*4);
+
             paddleCoords = &paddle1->position;
             paddleCoords->y = recvdCoords[0];
             paddleCoords->z = recvdCoords[1];
+            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
+            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
+
             paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
             //            SDLNet_TCP_Close(server);
