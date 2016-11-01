@@ -391,12 +391,14 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     int len = balls.size();
     int index;
 
-    for (int i = 0; i < len; i++) {
-        engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
-        balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-        balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
+    if(isServer) {
+        for (int i = 0; i < len; i++) {
+            engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+            balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+            balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
+                                trans.getRotation().getW());
+        }
     }
-
 	engine->update(evt.timeSinceLastFrame, 100);
 	lastHit++;
 	index = engine->checkCollide(paddle1, paddle2, blocks);

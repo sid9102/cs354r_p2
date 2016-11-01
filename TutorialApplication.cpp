@@ -60,7 +60,10 @@ void TutorialApplication::createScene(void)
 	else	
 		paddle2 = new Paddle();
 	balls.push_back(new Sphere(25, mSceneMgr));
-	blocks = LevelParser::parseLevel(blocks,mSceneMgr);
+    if(!multiplayer)
+    {
+        blocks = LevelParser::parseLevel(blocks,mSceneMgr);
+    }
 	engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2, multiplayer);
 }
 
