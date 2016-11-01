@@ -269,7 +269,7 @@ void BaseApplication::go(void)
 bool BaseApplication::setup(void)
 {
     isServer = true;
-    multiplayer = false;
+    multiplayer = true;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
@@ -426,18 +426,20 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		}
 	}
 
-	if (index == -5) {
-		if(lastHit>15) {
-			lastHit = 0;
-			p1lives--;
-		}
-	}
-	else if (index == -10 && multiplayer) {
-		if(lastHit>15) {
-			lastHit = 0;
-			p2lives--;
-		}
-	}
+    if(isServer) {
+        if (index == -5) {
+            if (lastHit > 15) {
+                lastHit = 0;
+                p1lives--;
+            }
+        } else if (index == -10 && multiplayer) {
+            if (lastHit > 15) {
+                lastHit = 0;
+                p2lives--;
+            }
+        }
+    }
+
 
 	/*/
 	newTime = time(0);
@@ -624,6 +626,7 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
         paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
         paddle1->dV = paddle1->lPosition - paddle1->position;
         engine->updatePaddle(paddle1);
+        engine->updatePaddle(paddle2);
     }
     else{
         //Client
@@ -747,6 +750,7 @@ void BaseApplication::updateClient()
             float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
             int sendBPos[3] = {bPosX, bPosY, bPosZ};
             double sendBRot[4] = {bRotX, bRotY, bRotZ, bRotW};
+            int sendScore[2] = {p1lives, p2lives};
 
             while(1)
             {
@@ -764,6 +768,7 @@ void BaseApplication::updateClient()
                     memcpy(sendBuffer, &sendCoords, sizeof(float)*2); // <-- this one
                     memcpy(&sendBuffer[sizeof(float)*2], &sendBPos, sizeof(int)*3);
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3], &sendBRot, sizeof(double)*4);
+                    memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], &sendScore, sizeof(int)*2);
                     SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4);
                     break;
                 }
@@ -805,10 +810,15 @@ void BaseApplication::updateClient()
             float recvdCoords[2];
             int recvdBPos[3];
             double recvdBRot[4];
+            int recvdScore[2];
 
             memcpy(recvdCoords, &recvBuffer, sizeof(float)*2);
             memcpy(&recvdBPos, &recvBuffer[sizeof(float)*2], sizeof(int)*3);
             memcpy(&recvdBRot, &recvBuffer[sizeof(float)*2 + sizeof(int)*3], sizeof(double)*4);
+            memcpy(&recvdScore, &recvBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], sizeof(int)*2);
+            p1lives = recvdScore[0];
+            p2lives = recvdScore[1];
+
 
             paddleCoords = &paddle1->position;
             paddleCoords->y = recvdCoords[0];
@@ -824,7 +834,7 @@ void BaseApplication::updateClient()
 //            trans.setRotation().setW(recvdBRot[3]);
 
 //            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
-//            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);\
+//            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
 
             balls.at(0)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
             balls.at(0)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
