@@ -448,7 +448,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     }*/
     //ball->update();
     //emptyRoom->checkCollide(ball);
-    updateClient();
+    if(multiplayer)
+        updateClient();
     return true;
 }
 //---------------------------------------------------------------------------
@@ -691,7 +692,7 @@ void BaseApplication::updateClient()
      * bringing us to  12 + (12 + 32) = 56 bytes = 448 bits */
 
     /* Contains information of the rotation of the ball within "trans" */
-    btTransform = trans;
+    btTransform trans;
     engine->ballRigidBody.at(0)->getMotionState()->getWorldTransform(trans);
 
     /* Might need to get the position and rotation of the ball using
@@ -710,14 +711,14 @@ void BaseApplication::updateClient()
 
     // The "ints" may need to be "floats" instead, or cast
     // 12 bytes
-    int bPosX = balls[0].getPos().x;
-    int bPosY = balls[0].getPos().y;
-    int bPosZ = balls[0].getPos().z;
+//    int bPosX = balls[0].getPos().x;
+//    int bPosY = balls[0].getPos().y;
+//    int bPosZ = balls[0].getPos().z;
     // 32 bytes
-    double bRotX = balls[0].getRotation().x;
-    double bRotY = balls[0].getRotation().y;
-    double bRotZ = balls[0].getRotation().z;
-    double bRotW = balls[0].getRotation().w;
+//    double bRotX = balls[0].getRotation().x;
+//    double bRotY = balls[0].getRotation().y;
+//    double bRotZ = balls[0].getRotation().z;
+//    double bRotW = balls[0].getRotation().w;
 
     bool update = false;
     if(lastUpdate == -1) {
@@ -803,15 +804,25 @@ void BaseApplication::updateClient()
             int recvdBPos[3];
             double recvdBRot[4];
 
-            memcpy(&recvdCoords, recvBuffer, sizeof(float)*2);
-            memcpy(&recvdBPos, recvBuffer[sizeof(float)*2], sizeof(int)*3);
-            memcpy(&recvdBRot, recvBuffer[sizeof(float)*2 + sizeof(int)*3], sizeof(double)*4);
+            memcpy(recvdCoords, &recvBuffer, sizeof(float)*2);
+            memcpy(&recvdBPos, &recvBuffer[sizeof(float)*2], sizeof(int)*3);
+            memcpy(&recvdBRot, &recvBuffer[sizeof(float)*2 + sizeof(int)*3], sizeof(double)*4);
 
             paddleCoords = &paddle1->position;
             paddleCoords->y = recvdCoords[0];
             paddleCoords->z = recvdCoords[1];
-            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
-            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
+            trans.setOrigin(btVector3(recvdBPos[0],recvdBPos[1], recvdBPos[2]));
+//            trans.setOrigin().setX(recvdBPos[0]);
+//            trans.setOrigin().setY(recvdBPos[1]);
+//            trans.setOrigin().setZ(recvdBPos[2]);
+            trans.setRotation(btQuaternion(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]));
+//            trans.setRotation().setX(recvdBRot[0]);
+//            trans.setRotation().setY(recvdBRot[1]);
+//            trans.setRotation().setZ(recvdBRot[2]);
+//            trans.setRotation().setW(recvdBRot[3]);
+
+//            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
+//            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
 
             paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
