@@ -769,7 +769,7 @@ void BaseApplication::updateClient()
                     memcpy(&sendBuffer[sizeof(float)*2], &sendBPos, sizeof(int)*3);
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3], &sendBRot, sizeof(double)*4);
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], &sendScore, sizeof(int)*2);
-                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4);
+                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4 + sizeof(int)*2);
                     break;
                 }
             }
