@@ -269,7 +269,9 @@ void BaseApplication::go(void)
 bool BaseApplication::setup(void)
 {
     isServer = true;
-    multiplayer = true;
+    multiplayer = false;
+    if(!multiplayer && !isServer)
+        isServer = true;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
