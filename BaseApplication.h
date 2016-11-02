@@ -59,6 +59,7 @@ http://www.ogre3d.org/wiki/
 #include "Room.h"
 #include "Paddle.h"
 #include "Physics.h"
+#include "SGUI.h"
 
 #ifdef OGRE_STATIC_LIB
 #  define OGRE_STATIC_GL
@@ -98,6 +99,8 @@ public:
     clock_t lastUpdate;
     std::string IPAddress;
 
+    // GUI
+    SGUI* mGUI;
 
 	// SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS // SCENE OBJECTS
 	Room* emptyRoom;

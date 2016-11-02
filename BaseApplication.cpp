@@ -640,6 +640,12 @@ bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
     {
         Mix_PlayChannel(-1, woosh, 0);
     }
+
+    /******************************************************************************
+     ** CEGUI Handler for mouse movement, do not delete!                         **
+     ******************************************************************************/
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.getDefaultGUIContext().injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
 //    printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
 }
@@ -648,6 +654,11 @@ bool BaseApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonI
 {
     if (mTrayMgr->injectMouseDown(arg, id)) return true;
     mCameraMan->injectMouseDown(arg, id);
+    /******************************************************************************
+    ** CEGUI Handler for mouse movement, do not delete!                         **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(mGUI->convertButton(id));
+    // END OF CEGUI HANDLER
     return true;
 }
 //---------------------------------------------------------------------------
@@ -655,6 +666,11 @@ bool BaseApplication::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButton
 {
     if (mTrayMgr->injectMouseUp(arg, id)) return true;
     mCameraMan->injectMouseUp(arg, id);
+    /******************************************************************************
+    ** CEGUI Handler for mouse movement, do not delete!                         **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(mGUI->convertButton(id));
+    // END OF CEGUI HANDLER
     return true;
 }
 //---------------------------------------------------------------------------

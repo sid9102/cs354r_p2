@@ -65,6 +65,10 @@ void TutorialApplication::createScene(void)
         blocks = LevelParser::parseLevel(blocks,mSceneMgr);
     }
 	engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2, multiplayer);
+
+    mGUI = new SGUI();
+    mGUI->setTitleScreenVisible(true);
+    mGUI->setP1ScoreVisible(false);
 }
 
 //---------------------------------------------------------------------------
