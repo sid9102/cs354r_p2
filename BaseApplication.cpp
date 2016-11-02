@@ -268,8 +268,8 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = true;
-    multiplayer = false;
+    isServer = false;
+    multiplayer = true;
     if(!multiplayer && !isServer)
         isServer = true;
     connectionOpened = false;
@@ -455,7 +455,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     //ball->update();
     //emptyRoom->checkCollide(ball);
     if(multiplayer)
-        updateClient();
+//        updateClient();
     return true;
 }
 //---------------------------------------------------------------------------

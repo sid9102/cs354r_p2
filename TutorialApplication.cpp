@@ -67,8 +67,8 @@ void TutorialApplication::createScene(void)
 	engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2, multiplayer);
 
     mGUI = new SGUI();
-    mGUI->setTitleScreenVisible(true);
-    mGUI->setP1ScoreVisible(false);
+//    mGUI->setTitleScreenVisible(true);
+//    mGUI->setP1ScoreVisible(false);
 }
 
 //---------------------------------------------------------------------------
