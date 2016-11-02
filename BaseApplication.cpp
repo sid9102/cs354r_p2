@@ -565,6 +565,13 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     }
 //    else if (arg.key == OIS::KC_Z)
 
+    /******************************************************************************
+    ** CEGUI Handler for key events, do not delete!                             **
+    ******************************************************************************/
+    CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
+    context.injectKeyDown((CEGUI::Key::Scan)arg.key);
+    context.injectChar((CEGUI::Key::Scan)arg.text);
+    // END CEGUI Handler
     mCameraMan->injectKeyDown(arg);
     return true;
 }
@@ -572,6 +579,11 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 {
     mCameraMan->injectKeyUp(arg);
+    /******************************************************************************
+    ** CEGUI Handler for key events, do not delete!                             **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp((CEGUI::Key::Scan)arg.key);
+    // END CEGUI KEY HANDLER
     return true;
 }
 //---------------------------------------------------------------------------
