@@ -700,10 +700,7 @@ void SGUI::setTimerVisible(bool isVisible) {
 }
 void SGUI::setTimer(int seconds) {
     std::string nTime = "";
-    if(seconds % 60 < 10)
-        nTime = "[colour='FF000000']"+std::to_string(seconds/60)+":0"+std::to_string(seconds%60);
-    else
-        nTime = "[colour='FF000000']"+std::to_string(seconds/60)+":"+std::to_string(seconds%60);
+    nTime = std::to_string(seconds);
     timebox_text->setText(nTime);
     timebox_time = seconds;
 }
@@ -775,7 +772,6 @@ bool SGUI::singlePlay(const CEGUI::EventArgs &e) {
 	title->setEnabled(false);
 	scorer->setVisible(true);
     setTimerVisible(true);
-    setTimer(60);
 	scorer_text->setVisible(true);
     isStarted = true;
     CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();

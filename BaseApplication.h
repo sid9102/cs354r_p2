@@ -94,6 +94,7 @@ public:
 	// Socket stuff
     bool isServer;
     bool connectionOpened;
+    bool sceneCreated;
 	TCPsocket server;
 	TCPsocket client;
     clock_t lastUpdate;

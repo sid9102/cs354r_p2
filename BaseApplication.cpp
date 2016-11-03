@@ -268,8 +268,7 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = false;
-    multiplayer = true;
+    isServer = true;
     if(!multiplayer && !isServer)
         isServer = true;
     connectionOpened = false;
@@ -292,8 +291,8 @@ bool BaseApplication::setup(void)
     // Load resources
     loadResources();
 
-    // Create the scene
-    createScene();
+    mGUI = new SGUI();
+    mGUI->setTitleScreenVisible(true);
 
     createFrameListener();
 
@@ -340,10 +339,10 @@ bool BaseApplication::setup(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-    if(mWindow->isClosed())
+    if (mWindow->isClosed())
         return false;
 
-    if(mShutDown)
+    if (mShutDown)
         return false;
 
     // Need to capture/update each device
@@ -352,110 +351,108 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     mTrayMgr->frameRenderingQueued(evt);
 
-    if(p1lives<=0||p2lives<=0) {
-        mDetailsPanel->hide();
-    	//mWinBox->show();
-    }
-
-    if (!mTrayMgr->isDialogVisible())
-    {
+    if (!mTrayMgr->isDialogVisible()) {
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
-		if(multiplayer)
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
-		else
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
-			/*
-            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
-            mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
-            mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
-            mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
-            mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
-            mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
-            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-            */
+            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
+            if (multiplayer)
+                mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
+            else
+                mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
         }
     }
-    /*
-    for (int i = 0; i < NUM_SPHERE; i++) {
 
-        ball[i]->update();
-        emptyRoom->checkCollide(ball[i]);
-        for (int j = i + 1; j < NUM_SPHERE; j++) {
-            emptyRoom->checkCollide(ball[i], ball[j]);
+    if(mGUI->isStarted && sceneCreated) {
+        if (p1lives <= 0 || p2lives <= 0) {
+            mDetailsPanel->hide();
+            //mWinBox->show();
         }
-    }
-    */
+        /*
+        for (int i = 0; i < NUM_SPHERE; i++) {
 
-    btTransform trans;
-    int len = balls.size();
-    int index;
-
-    if(isServer) {
-        for (int i = 0; i < len; i++) {
-            engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
-            balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-            balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
-                                trans.getRotation().getW());
-        }
-    }
-	engine->update(evt.timeSinceLastFrame, 100);
-	lastHit++;
-	index = engine->checkCollide(paddle1, paddle2, blocks);
-
-	if(index > 0) {
-		score += blocks.at(index-1) ->destroy();
-		if(soundOn) {
-			switch (blocks.at(index-1)->type) {
-			case paper:
-				Mix_PlayChannel(-1, paper_sound, 0);
-				break;
-			case wood:
-				Mix_PlayChannel(-1, wood_sound, 0);
-				break;
-			case stone:
-				Mix_PlayChannel(-1, stone_sound, 0);
-				break;
-			case brick:
-				Mix_PlayChannel(-1, brick_sound, 0);
-				break;
-			case metal:
-				Mix_PlayChannel(-1, metal_sound, 0);
-				break;
-			}
-		}
-	}
-
-    if(isServer) {
-        if (index == -5) {
-            if (lastHit > 15) {
-                lastHit = 0;
-                p1lives--;
-            }
-        } else if (index == -10 && multiplayer) {
-            if (lastHit > 15) {
-                lastHit = 0;
-                p2lives--;
+            ball[i]->update();
+            emptyRoom->checkCollide(ball[i]);
+            for (int j = i + 1; j < NUM_SPHERE; j++) {
+                emptyRoom->checkCollide(ball[i], ball[j]);
             }
         }
-    }
+        */
 
+        btTransform trans;
+        int len = balls.size();
+        int index;
 
-	/*/
-	newTime = time(0);
-	frameTime = newTime - currentTime;
-	currentTime = time(0);
+        if (isServer) {
+            for (int i = 0; i < len; i++) {
+                engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+                balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+                balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
+                                    trans.getRotation().getW());
+            }
+        }
+        engine->update(evt.timeSinceLastFrame, 100);
+        lastHit++;
+        index = engine->checkCollide(paddle1, paddle2, blocks);
 
-    while (frameTime >= 0) {
+        if (index > 0) {
+            score += blocks.at(index - 1)->destroy();
+            if (soundOn) {
+                switch (blocks.at(index - 1)->type) {
+                    case paper:
+                        Mix_PlayChannel(-1, paper_sound, 0);
+                        break;
+                    case wood:
+                        Mix_PlayChannel(-1, wood_sound, 0);
+                        break;
+                    case stone:
+                        Mix_PlayChannel(-1, stone_sound, 0);
+                        break;
+                    case brick:
+                        Mix_PlayChannel(-1, brick_sound, 0);
+                        break;
+                    case metal:
+                        Mix_PlayChannel(-1, metal_sound, 0);
+                        break;
+                }
+            }
+        }
 
-        frameTime -= dt;
-    }*/
-    //ball->update();
-    //emptyRoom->checkCollide(ball);
-    if(multiplayer)
+        if (isServer) {
+            if (index == -5) {
+                if (lastHit > 15) {
+                    lastHit = 0;
+                    p1lives--;
+                }
+            } else if (index == -10 && multiplayer) {
+                if (lastHit > 15) {
+                    lastHit = 0;
+                    p2lives--;
+                }
+            }
+        }
+
+        /*/
+        newTime = time(0);
+        frameTime = newTime - currentTime;
+        currentTime = time(0);
+
+        while (frameTime >= 0) {
+
+            frameTime -= dt;
+        }*/
+        //ball->update();
+        //emptyRoom->checkCollide(ball);
+        if (multiplayer) {
 //        updateClient();
+        }
+    }
+    else if(mGUI->isStarted)
+    {
+        multiplayer = mGUI->multiStarted;
+        createScene();
+        sceneCreated = true;
+    }
     return true;
 }
 //---------------------------------------------------------------------------
@@ -589,68 +586,60 @@ bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-    Ogre::Vector3* paddleCoords;
+    if(sceneCreated) {
+        Ogre::Vector3 *paddleCoords;
 
-    if(isServer){
-        //Server
-        paddle1->lPosition = paddle1->position;
-        paddleCoords = &paddle1->position;
-    }
-    else{
-        //Client
-        paddle2->lPosition = paddle2->position;
-        paddleCoords = &paddle2->position;
-    }
-    if (mTrayMgr->injectMouseMove(arg)) return true;
+        if (isServer) {
+            //Server
+            paddle1->lPosition = paddle1->position;
+            paddleCoords = &paddle1->position;
+        } else {
+            //Client
+            paddle2->lPosition = paddle2->position;
+            paddleCoords = &paddle2->position;
+        }
+        if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
-    float xDiff = arg.state.X.rel;
-    float yDiff = arg.state.Y.rel;
+        float xDiff = arg.state.X.rel;
+        float yDiff = arg.state.Y.rel;
 
-    if(isServer){
-        //Server
-        paddleCoords->z += xDiff;
-        paddleCoords->y -= yDiff; // Was left out for some reason?
-    }
-    else{
-        //Client
-        paddleCoords->z -= xDiff;
-        paddleCoords->y -= yDiff;
-    }
+        if (isServer) {
+            //Server
+            paddleCoords->z += xDiff;
+            paddleCoords->y -= yDiff; // Was left out for some reason?
+        } else {
+            //Client
+            paddleCoords->z -= xDiff;
+            paddleCoords->y -= yDiff;
+        }
 
-    if (paddleCoords->z > 250)
-    {
-        paddleCoords->z = 250;
-    }
-    else if(paddleCoords->z < -250)
-    {
-        paddleCoords->z = -250;
-    }
+        if (paddleCoords->z > 250) {
+            paddleCoords->z = 250;
+        } else if (paddleCoords->z < -250) {
+            paddleCoords->z = -250;
+        }
 
-    if(paddleCoords->y > 500)
-    {
-        paddleCoords->y = 500;
-    }
-    else if(paddleCoords->y < 0)
-    {
-        paddleCoords->y = 0;
-    }
+        if (paddleCoords->y > 500) {
+            paddleCoords->y = 500;
+        } else if (paddleCoords->y < 0) {
+            paddleCoords->y = 0;
+        }
 
-    if(isServer){
-        //Server
-        paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-        paddle1->dV = paddle1->lPosition - paddle1->position;
-        engine->updatePaddle(paddle1);
-        engine->updatePaddle(paddle2);
-    }
-    else{
-        //Client
-        paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-        paddle2->dV = paddle2->lPosition - paddle2->position;
-        engine->updatePaddle(paddle2);
-    }
-    if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
-    {
-        Mix_PlayChannel(-1, woosh, 0);
+        if (isServer) {
+            //Server
+            paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+            paddle1->dV = paddle1->lPosition - paddle1->position;
+            engine->updatePaddle(paddle1);
+            engine->updatePaddle(paddle2);
+        } else {
+            //Client
+            paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+            paddle2->dV = paddle2->lPosition - paddle2->position;
+            engine->updatePaddle(paddle2);
+        }
+        if ((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn) {
+            Mix_PlayChannel(-1, woosh, 0);
+        }
     }
 
     /******************************************************************************

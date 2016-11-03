@@ -55,20 +55,13 @@ void TutorialApplication::createScene(void)
 
 	emptyRoom = new Room(1500, 500, 500, mSceneMgr);
 	paddle1 = new Paddle(mSceneMgr, Ogre::Vector3(-300, 250, 0), 1);
-	if(multiplayer)
-		paddle2 = new Paddle(mSceneMgr, Ogre::Vector3(300, 250, 0), 2);
-	else	
-		paddle2 = new Paddle();
 	balls.push_back(new Sphere(25, mSceneMgr));
-    if(!multiplayer)
-    {
+    paddle2 = new Paddle();
+    if(multiplayer)
+        paddle2 = new Paddle(mSceneMgr, Ogre::Vector3(300, 250, 0), 2);
+    else
         blocks = LevelParser::parseLevel(blocks,mSceneMgr);
-    }
-	engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2, multiplayer);
-
-    mGUI = new SGUI();
-//    mGUI->setTitleScreenVisible(true);
-//    mGUI->setP1ScoreVisible(false);
+    engine = new Physics(balls, blocks, emptyRoom, paddle1, paddle2, multiplayer);
 }
 
 //---------------------------------------------------------------------------
