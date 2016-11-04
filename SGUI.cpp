@@ -6,6 +6,7 @@ SGUI::SGUI() {
     tMod = 0;
     timebox_time = 60;
     isStarted = false;
+    isServer = true;
     isPaused = false;
     isGameOver = false;
     multiStarted = false;
@@ -796,9 +797,28 @@ bool SGUI::multi_con_ex_click(const CEGUI::EventArgs &e) {
 bool SGUI::hosting(const CEGUI::EventArgs &e) {
     splay->setEnabled(false);
     mplay->setEnabled(false);
-    setServerStartVisible(true);
     setMultiConVisible(false);
-    clihos_desc->setText("Host program is now started, please give the IP address displayed above to other players you want to join");
+    multiStarted = true;
+
+    struct ifaddrs *ifap, *ifa;
+    struct sockaddr_in *sa;
+    char *addr;
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr->sa_family==AF_INET) {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+            addr = inet_ntoa(sa->sin_addr);
+            printf("Interface: %s\tAddress: %s\n", ifa->ifa_name, addr);
+        }
+    }
+    std::string IPAddress = std::string(addr);
+    std::cout << "GOT IP OF THIS MACHINE!!!!! IT'S " << IPAddress << "\n";
+    updateIPAddress(IPAddress);
+    freeifaddrs(ifap);
+
+    setHostVisible(true);
+    clihos_desc->setText("Type the IP address above into the other player's computer, click Ok on this machine, then click Ok on the other player's computer. Press Esc to quit.");
     clihos_IP->setProperty("ReadOnly", "true");
     nFlags = 1;
 }
@@ -858,8 +878,10 @@ bool SGUI::connecting(const CEGUI::EventArgs &e) {
     }
     if(marker < 1000 && octet == 4) {
         currentAddress = clihos_IP->getText().c_str();
-        setConnectingVisible(true);
         setClientVisible(false);
+        isServer = false;
+        multiStarted = true;
+        isStarted = true;
     } else {
         clihos_desc->setText("Malformed IP Address! Check address and try again!");
     }
@@ -887,9 +909,9 @@ bool SGUI::starting(const CEGUI::EventArgs &e) {
     setHostVisible(false);
     setTimerVisible(true);
     setTitleScreenVisible(false);
-    playerMessageVisible(true);
     setP1ScoreVisible(true);
     multiStarted = true;
+    isStarted = true;
     CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
 }
 

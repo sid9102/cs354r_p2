@@ -11,6 +11,9 @@
 #include <OIS/OISMouse.h>
 #include <iostream>
 #include <string>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
+
 class SGUI
 {
 public:
@@ -19,6 +22,7 @@ public:
     bool                    isGameOver;                             // Used to determine whether the game has ended or not
     bool                    isStarted;                              // Used to determine whether the game is started or not
     bool                    multiStarted;                           // used to determine whether a multiplayer game is ready to be started or not
+    bool                    isServer;
     std::string             currentAddress;                         // Used to hold the IP Address for the server program (or the game to connect to in the clients case)
     int                     nFlags;                                 // Flag used to determine who is hosting and who is the client HOST = 1, CLIENT = 0 UNSTARTED = -1
     int                     timebox_time;                           // holds the numeric time for the timer

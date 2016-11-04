@@ -268,9 +268,6 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = true;
-    if(!multiplayer && !isServer)
-        isServer = true;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
@@ -444,12 +441,13 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         //ball->update();
         //emptyRoom->checkCollide(ball);
         if (multiplayer) {
-//        updateClient();
+        updateClient();
         }
     }
     else if(mGUI->isStarted)
     {
         multiplayer = mGUI->multiStarted;
+        isServer = mGUI->isServer;
         createScene();
         sceneCreated = true;
     }
@@ -770,7 +768,6 @@ void BaseApplication::updateClient()
             int sendBPos[3] = {bPosX, bPosY, bPosZ};
             double sendBRot[4] = {bRotX, bRotY, bRotZ, bRotW};
             int sendScore[2] = {p1lives, p2lives};
-
             while(1)
             {
                 if(!connectionOpened)
@@ -779,6 +776,7 @@ void BaseApplication::updateClient()
                     if(client)
                     {
                         connectionOpened = true;
+                        mGUI->setHostVisible(false);
                     }
                 }
                 if(client)
@@ -789,6 +787,12 @@ void BaseApplication::updateClient()
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3], &sendBRot, sizeof(double)*4);
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], &sendScore, sizeof(int)*2);
                     SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4 + sizeof(int)*2);
+                    break;
+                }
+                mKeyboard->capture();
+                if(mKeyboard->isKeyDown(OIS::KC_ESCAPE))
+                {
+                    mShutDown = true;
                     break;
                 }
             }
@@ -813,6 +817,7 @@ void BaseApplication::updateClient()
             if(!connectionOpened)
             {
                 IPaddress ip;
+                std::cout << "Attempting to connect to " << mGUI->currentAddress << "\n";
                 SDLNet_ResolveHost(&ip, mGUI->currentAddress.c_str(), 1234);
                 server=SDLNet_TCP_Open(&ip);
                 connectionOpened = true;
