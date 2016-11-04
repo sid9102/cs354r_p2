@@ -277,7 +277,6 @@ bool BaseApplication::setup(void)
     if (!carryOn) return false;
 
     chooseSceneManager();
-    createCamera();
     createViewports();
 
     // Set default mipmap level (NB some APIs ignore this)
@@ -448,6 +447,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     {
         multiplayer = mGUI->multiStarted;
         isServer = mGUI->isServer;
+        createCamera();
         createScene();
         sceneCreated = true;
     }
