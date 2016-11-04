@@ -818,7 +818,7 @@ bool SGUI::hosting(const CEGUI::EventArgs &e) {
     freeifaddrs(ifap);
 
     setHostVisible(true);
-    clihos_desc->setText("Type the IP address above into the other player's computer, click Ok on this machine, then click Ok on the other player's computer. Press Esc to quit.");
+    clihos_desc->setText("Type the IP address above into the other player's computer, click OK! on this machine, then click Connect on the other player's computer. Press Esc to quit.");
     clihos_IP->setProperty("ReadOnly", "true");
     nFlags = 1;
 }
@@ -882,6 +882,7 @@ bool SGUI::connecting(const CEGUI::EventArgs &e) {
         isServer = false;
         multiStarted = true;
         isStarted = true;
+        setTitleScreenVisible(false);
     } else {
         clihos_desc->setText("Malformed IP Address! Check address and try again!");
     }
