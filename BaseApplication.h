@@ -98,7 +98,6 @@ public:
 	TCPsocket server;
 	TCPsocket client;
     clock_t lastUpdate;
-    std::string IPAddress;
 
     // GUI
     SGUI* mGUI;
