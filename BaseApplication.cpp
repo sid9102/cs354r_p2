@@ -91,22 +91,8 @@ void BaseApplication::createCamera(void)
 {
     // Create the camera
     mCamera = mSceneMgr->createCamera("PlayerCam");
-    // Position it at 500 in Z direction
-    if (isServer){
-        //Server
-        mCamera->setPosition(Ogre::Vector3(-740,250,0));
-    }
-    else{
-        //Client
-        mCamera->setPosition(Ogre::Vector3(740,250,0));
-    }
-    // Look back along -Z
-    if(isServer){
-        mCamera->lookAt(Ogre::Vector3(1500,250,0));
-    }
-    else{
-        mCamera->lookAt(Ogre::Vector3(-1500,250,0));
-    }
+    mCamera->setPosition(Ogre::Vector3(-740,250,0));
+    mCamera->lookAt(Ogre::Vector3(1500,250,0));
 
     mCamera->setNearClipDistance(5);
 
@@ -268,8 +254,6 @@ void BaseApplication::go(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-    isServer = true;
-    multiplayer = false;
     connectionOpened = false;
     mRoot = new Ogre::Root(mPluginsCfg);
 
@@ -290,8 +274,8 @@ bool BaseApplication::setup(void)
     // Load resources
     loadResources();
 
-    // Create the scene
-    createScene();
+    mGUI = new SGUI();
+    mGUI->setTitleScreenVisible(true);
 
     createFrameListener();
 
@@ -322,15 +306,6 @@ bool BaseApplication::setup(void)
         printf("SDLNet_Init: %s\n", SDLNet_GetError());
         exit(2);
     }
-    if(!isServer)
-    {
-        std::ifstream myfile("ServerIP.txt");
-        getline (myfile,IPAddress);
-        myfile.close();
-        printf("GOT IP ADDRESS OF SERVER: ");
-        printf(IPAddress.c_str());
-        printf("\n");
-    }
 
     lastUpdate = -1;
     return true;
@@ -338,10 +313,10 @@ bool BaseApplication::setup(void)
 //---------------------------------------------------------------------------
 bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-    if(mWindow->isClosed())
+    if (mWindow->isClosed())
         return false;
 
-    if(mShutDown)
+    if (mShutDown)
         return false;
 
     // Need to capture/update each device
@@ -349,107 +324,139 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     mMouse->capture();
 
     mTrayMgr->frameRenderingQueued(evt);
+    mDetailsPanel->hide();
 
-    if(p1lives<=0||p2lives<=0) {
-        mDetailsPanel->hide();
-    	//mWinBox->show();
-    }
-
-    if (!mTrayMgr->isDialogVisible())
-    {
+    if (!mTrayMgr->isDialogVisible()) {
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
         if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents
         {
-		mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
-		if(multiplayer)
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
-		else
-			mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
-			/*
-            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mWindow->getAverageFPS()));
-            mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));
-            mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));
-            mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));
-            mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));
-            mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));
-            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));
-            */
+            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(p1lives)); // replace 0 w/score var
+            if (multiplayer)
+                mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(p2lives)); // replace 2 w/lives var
+            else
+                mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
         }
     }
-    /*
-    for (int i = 0; i < NUM_SPHERE; i++) {
-
-        ball[i]->update();
-        emptyRoom->checkCollide(ball[i]);
-        for (int j = i + 1; j < NUM_SPHERE; j++) {
-            emptyRoom->checkCollide(ball[i], ball[j]);
+    if(multiplayer) {
+        mGUI->updateP1Score(p1lives);
+        mGUI->updateP2Score(p2lives);
+    }
+    if(mGUI->isStarted && sceneCreated) {
+        if (p1lives <= 0 || p2lives <= 0 || score >= 640) {
+            mGUI->setGOverScreenVisible(true);
+            mGUI->setP1ScoreVisible(false);
+            mGUI->setP2ScoreVisible(false);
+            mGUI->setTimerVisible(false);
+//            mDetailsPanel->hide();
+            //mWinBox->show();
         }
-    }
-    */
+        /*
+        for (int i = 0; i < NUM_SPHERE; i++) {
 
-    btTransform trans;
-    int len = balls.size();
-    int index;
+            ball[i]->update();
+            emptyRoom->checkCollide(ball[i]);
+            for (int j = i + 1; j < NUM_SPHERE; j++) {
+                emptyRoom->checkCollide(ball[i], ball[j]);
+            }
+        }
+        */
 
-    for (int i = 0; i < len; i++) {
-        engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
-        balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
-        balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(), trans.getRotation().getW());
-    }
+        btTransform trans;
+        int len = balls.size();
+        int index;
 
-	engine->update(evt.timeSinceLastFrame, 100);
-	lastHit++;
-	index = engine->checkCollide(paddle1, paddle2, blocks);
+        if (isServer) {
+            for (int i = 0; i < len; i++) {
+                engine->ballRigidBody.at(i)->getMotionState()->getWorldTransform(trans);
+                balls.at(i)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+                balls.at(i)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
+                                    trans.getRotation().getW());
+            }
+        }
+        engine->update(evt.timeSinceLastFrame, 100);
+        lastHit++;
+        index = engine->checkCollide(paddle1, paddle2, blocks);
 
-	if(index > 0) {
-		score += blocks.at(index-1) ->destroy();
-		if(soundOn) {
-			switch (blocks.at(index-1)->type) {
-			case paper:
-				Mix_PlayChannel(-1, paper_sound, 0);
-				break;
-			case wood:
-				Mix_PlayChannel(-1, wood_sound, 0);
-				break;
-			case stone:
-				Mix_PlayChannel(-1, stone_sound, 0);
-				break;
-			case brick:
-				Mix_PlayChannel(-1, brick_sound, 0);
-				break;
-			case metal:
-				Mix_PlayChannel(-1, metal_sound, 0);
-				break;
-			}
-		}
-	}
+        if (index > 0) {
+            score += blocks.at(index - 1)->destroy();
+            if(!multiplayer) {
+                mGUI->updateP1Score(score);
+            }
+            if (soundOn) {
+                switch (blocks.at(index - 1)->type) {
+                    case paper:
+                        Mix_PlayChannel(-1, paper_sound, 0);
+                        break;
+                    case wood:
+                        Mix_PlayChannel(-1, wood_sound, 0);
+                        break;
+                    case stone:
+                        Mix_PlayChannel(-1, stone_sound, 0);
+                        break;
+                    case brick:
+                        Mix_PlayChannel(-1, brick_sound, 0);
+                        break;
+                    case metal:
+                        Mix_PlayChannel(-1, metal_sound, 0);
+                        break;
+                }
+            }
+        }
+        // Can be right after p1lives, but won't 'initialize' properly then.
+        if(!multiplayer) {
+            mGUI->setTimer(p1lives);
+        }
+        if (isServer) {
+            if (index == -5) {
+                if (lastHit > 15) {
+                    lastHit = 0;
+                    p1lives--;
+                }
+            } else if (index == -10 && multiplayer) {
+                if (lastHit > 15) {
+                    lastHit = 0;
+                    p2lives--;
+                }
+            }
+        }
 
-	if (index == -5) {
-		if(lastHit>15) {
-			lastHit = 0;
-			p1lives--;
-		}
-	}
-	else if (index == -10 && multiplayer) {
-		if(lastHit>15) {
-			lastHit = 0;
-			p2lives--;
-		}
-	}
+        /*/
+        newTime = time(0);
+        frameTime = newTime - currentTime;
+        currentTime = time(0);
 
-	/*/
-	newTime = time(0);
-	frameTime = newTime - currentTime;
-	currentTime = time(0);
+        while (frameTime >= 0) {
 
-    while (frameTime >= 0) {
-
-        frameTime -= dt;
-    }*/
-    //ball->update();
-    //emptyRoom->checkCollide(ball);
-    if(multiplayer)
+            frameTime -= dt;
+        }*/
+        //ball->update();
+        //emptyRoom->checkCollide(ball);
+        if (multiplayer) {
         updateClient();
+        }
+    }
+    else if(mGUI->isStarted)
+    {
+        multiplayer = mGUI->multiStarted;
+        isServer = mGUI->isServer;
+        if (isServer){
+            //Server
+            mCamera->setPosition(Ogre::Vector3(-740,250,0));
+        }
+        else{
+            //Client
+            mCamera->setPosition(Ogre::Vector3(740,250,0));
+        }
+        // Look back along -Z
+        if(isServer){
+            mCamera->lookAt(Ogre::Vector3(1500,250,0));
+        }
+        else{
+            mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+        }
+        createScene();
+        sceneCreated = true;
+    }
     return true;
 }
 //---------------------------------------------------------------------------
@@ -559,6 +566,13 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     }
 //    else if (arg.key == OIS::KC_Z)
 
+    /******************************************************************************
+    ** CEGUI Handler for key events, do not delete!                             **
+    ******************************************************************************/
+    CEGUI::GUIContext& context = CEGUI::System::getSingleton().getDefaultGUIContext();
+    context.injectKeyDown((CEGUI::Key::Scan)arg.key);
+    context.injectChar((CEGUI::Key::Scan)arg.text);
+    // END CEGUI Handler
     mCameraMan->injectKeyDown(arg);
     return true;
 }
@@ -566,73 +580,77 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
 bool BaseApplication::keyReleased(const OIS::KeyEvent &arg)
 {
     mCameraMan->injectKeyUp(arg);
+    /******************************************************************************
+    ** CEGUI Handler for key events, do not delete!                             **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp((CEGUI::Key::Scan)arg.key);
+    // END CEGUI KEY HANDLER
     return true;
 }
 //---------------------------------------------------------------------------
 bool BaseApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-    Ogre::Vector3* paddleCoords;
+    if(sceneCreated) {
+        Ogre::Vector3 *paddleCoords;
 
-    if(isServer){
-        //Server
-        paddle1->lPosition = paddle1->position;
-        paddleCoords = &paddle1->position;
-    }
-    else{
-        //Client
-        paddle2->lPosition = paddle2->position;
-        paddleCoords = &paddle2->position;
-    }
-    if (mTrayMgr->injectMouseMove(arg)) return true;
+        if (isServer) {
+            //Server
+            paddle1->lPosition = paddle1->position;
+            paddleCoords = &paddle1->position;
+        } else {
+            //Client
+            paddle2->lPosition = paddle2->position;
+            paddleCoords = &paddle2->position;
+        }
+        if (mTrayMgr->injectMouseMove(arg)) return true;
 //    mCameraMan->injectMouseMove(arg);
-    float xDiff = arg.state.X.rel;
-    float yDiff = arg.state.Y.rel;
+        float xDiff = arg.state.X.rel;
+        float yDiff = arg.state.Y.rel;
 
-    if(isServer){
-        //Server
-        paddleCoords->z += xDiff;
-        paddleCoords->y -= yDiff; // Was left out for some reason?
-    }
-    else{
-        //Client
-        paddleCoords->z -= xDiff;
-        paddleCoords->y -= yDiff;
+        if (isServer) {
+            //Server
+            paddleCoords->z += xDiff;
+            paddleCoords->y -= yDiff; // Was left out for some reason?
+        } else {
+            //Client
+            paddleCoords->z -= xDiff;
+            paddleCoords->y -= yDiff;
+        }
+
+        if (paddleCoords->z > 250) {
+            paddleCoords->z = 250;
+        } else if (paddleCoords->z < -250) {
+            paddleCoords->z = -250;
+        }
+
+        if (paddleCoords->y > 500) {
+            paddleCoords->y = 500;
+        } else if (paddleCoords->y < 0) {
+            paddleCoords->y = 0;
+        }
+
+        if (isServer) {
+            //Server
+            paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+            paddle1->dV = paddle1->lPosition - paddle1->position;
+            engine->updatePaddle(paddle1);
+            engine->updatePaddle(paddle2);
+        } else {
+            //Client
+            paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
+            paddle2->dV = paddle2->lPosition - paddle2->position;
+            engine->updatePaddle(paddle2);
+        }
+        if ((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn) {
+            Mix_PlayChannel(-1, woosh, 0);
+        }
     }
 
-    if (paddleCoords->z > 250)
-    {
-        paddleCoords->z = 250;
-    }
-    else if(paddleCoords->z < -250)
-    {
-        paddleCoords->z = -250;
-    }
-
-    if(paddleCoords->y > 500)
-    {
-        paddleCoords->y = 500;
-    }
-    else if(paddleCoords->y < 0)
-    {
-        paddleCoords->y = 0;
-    }
-
-    if(isServer){
-        //Server
-        paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-        paddle1->dV = paddle1->lPosition - paddle1->position;
-        engine->updatePaddle(paddle1);
-    }
-    else{
-        //Client
-        paddle2->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
-        paddle2->dV = paddle2->lPosition - paddle2->position;
-        engine->updatePaddle(paddle2);
-    }
-    if((xDiff > 25 || xDiff < -25 || yDiff > 25 || yDiff < -25) && soundOn)
-    {
-        Mix_PlayChannel(-1, woosh, 0);
-    }
+    /******************************************************************************
+     ** CEGUI Handler for mouse movement, do not delete!                         **
+     ******************************************************************************/
+    CEGUI::System &sys = CEGUI::System::getSingleton();
+    sys.getDefaultGUIContext().injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
 //    printf("xDiff: %f, yDiff: %f, paddleCoords->z:%f, paddleCoords->y:%f\n", xDiff, yDiff, paddleCoords->z, paddleCoords->y);
     return true;
 }
@@ -641,6 +659,11 @@ bool BaseApplication::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonI
 {
     if (mTrayMgr->injectMouseDown(arg, id)) return true;
     mCameraMan->injectMouseDown(arg, id);
+    /******************************************************************************
+    ** CEGUI Handler for mouse movement, do not delete!                         **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(mGUI->convertButton(id));
+    // END OF CEGUI HANDLER
     return true;
 }
 //---------------------------------------------------------------------------
@@ -648,6 +671,11 @@ bool BaseApplication::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButton
 {
     if (mTrayMgr->injectMouseUp(arg, id)) return true;
     mCameraMan->injectMouseUp(arg, id);
+    /******************************************************************************
+    ** CEGUI Handler for mouse movement, do not delete!                         **
+    ******************************************************************************/
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(mGUI->convertButton(id));
+    // END OF CEGUI HANDLER
     return true;
 }
 //---------------------------------------------------------------------------
@@ -745,7 +773,7 @@ void BaseApplication::updateClient()
             float sendCoords[2] = {paddleCoords->y, paddleCoords->z};
             int sendBPos[3] = {bPosX, bPosY, bPosZ};
             double sendBRot[4] = {bRotX, bRotY, bRotZ, bRotW};
-
+            int sendScore[2] = {p1lives, p2lives};
             while(1)
             {
                 if(!connectionOpened)
@@ -754,6 +782,7 @@ void BaseApplication::updateClient()
                     if(client)
                     {
                         connectionOpened = true;
+                        mGUI->setHostVisible(false);
                     }
                 }
                 if(client)
@@ -762,7 +791,14 @@ void BaseApplication::updateClient()
                     memcpy(sendBuffer, &sendCoords, sizeof(float)*2); // <-- this one
                     memcpy(&sendBuffer[sizeof(float)*2], &sendBPos, sizeof(int)*3);
                     memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3], &sendBRot, sizeof(double)*4);
-                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4);
+                    memcpy(&sendBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], &sendScore, sizeof(int)*2);
+                    SDLNet_TCP_Send(client, sendBuffer, sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4 + sizeof(int)*2);
+                    break;
+                }
+                mKeyboard->capture();
+                if(mKeyboard->isKeyDown(OIS::KC_ESCAPE))
+                {
+                    mShutDown = true;
                     break;
                 }
             }
@@ -787,7 +823,8 @@ void BaseApplication::updateClient()
             if(!connectionOpened)
             {
                 IPaddress ip;
-                SDLNet_ResolveHost(&ip, IPAddress.c_str(), 1234);
+                std::cout << "Attempting to connect to " << mGUI->currentAddress << "\n";
+                SDLNet_ResolveHost(&ip, mGUI->currentAddress.c_str(), 1234);
                 server=SDLNet_TCP_Open(&ip);
                 connectionOpened = true;
             }
@@ -803,10 +840,15 @@ void BaseApplication::updateClient()
             float recvdCoords[2];
             int recvdBPos[3];
             double recvdBRot[4];
+            int recvdScore[2];
 
             memcpy(recvdCoords, &recvBuffer, sizeof(float)*2);
             memcpy(&recvdBPos, &recvBuffer[sizeof(float)*2], sizeof(int)*3);
             memcpy(&recvdBRot, &recvBuffer[sizeof(float)*2 + sizeof(int)*3], sizeof(double)*4);
+            memcpy(&recvdScore, &recvBuffer[sizeof(float)*2 + sizeof(int)*3 + sizeof(double)*4], sizeof(int)*2);
+            p1lives = recvdScore[0];
+            p2lives = recvdScore[1];
+
 
             paddleCoords = &paddle1->position;
             paddleCoords->y = recvdCoords[0];
@@ -823,6 +865,10 @@ void BaseApplication::updateClient()
 
 //            balls[0]->setPos(recvdBPos[0], recvdBPos[1], recvdBPos[2]);
 //            balls[0]->setRot(recvdBRot[0], recvdBRot[1], recvdBRot[2], recvdBRot[3]);
+
+            balls.at(0)->setPos(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+            balls.at(0)->setRot(trans.getRotation().getX(), trans.getRotation().getY(), trans.getRotation().getZ(),
+                                trans.getRotation().getW());
 
             paddle1->setPos(paddleCoords->x, paddleCoords->y, paddleCoords->z);
 
