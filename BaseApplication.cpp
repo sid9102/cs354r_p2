@@ -350,6 +350,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     mMouse->capture();
 
     mTrayMgr->frameRenderingQueued(evt);
+    mDetailsPanel->hide();
 
     if (!mTrayMgr->isDialogVisible()) {
         mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera
@@ -363,9 +364,14 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
         }
     }
 
+
     if(mGUI->isStarted && sceneCreated) {
-        if (p1lives <= 0 || p2lives <= 0) {
-            mDetailsPanel->hide();
+        if (p1lives <= 0 || p2lives <= 0 || score >= 640) {
+            mGUI->setGOverScreenVisible(true);
+            mGUI->setP1ScoreVisible(false);
+            mGUI->setP2ScoreVisible(false);
+            mGUI->setTimerVisible(false);
+//            mDetailsPanel->hide();
             //mWinBox->show();
         }
         /*
@@ -397,6 +403,7 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
         if (index > 0) {
             score += blocks.at(index - 1)->destroy();
+            mGUI->updateP1Score(score);
             if (soundOn) {
                 switch (blocks.at(index - 1)->type) {
                     case paper:
@@ -417,6 +424,8 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
                 }
             }
         }
+        // Can be right after p1lives, but won't 'initialize' properly then.
+        mGUI->setTimer(p1lives);
 
         if (isServer) {
             if (index == -5) {

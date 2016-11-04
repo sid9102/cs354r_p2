@@ -700,7 +700,7 @@ void SGUI::setTimerVisible(bool isVisible) {
 }
 void SGUI::setTimer(int seconds) {
     std::string nTime = "";
-    nTime = std::to_string(seconds);
+    nTime = "[colour='FF000000']"+std::to_string(seconds);
     timebox_text->setText(nTime);
     timebox_time = seconds;
 }
