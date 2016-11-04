@@ -883,6 +883,8 @@ bool SGUI::connecting(const CEGUI::EventArgs &e) {
         multiStarted = true;
         isStarted = true;
         setTitleScreenVisible(false);
+        setP2ScoreVisible();
+        setP1ScoreVisible();
         CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
     } else {
         clihos_desc->setText("Malformed IP Address! Check address and try again!");
@@ -909,9 +911,9 @@ CEGUI::MouseButton SGUI::convertButton(OIS::MouseButtonID buttonID)
 
 bool SGUI::starting(const CEGUI::EventArgs &e) {
     setHostVisible(false);
-    setTimerVisible(true);
     setTitleScreenVisible(false);
     setP1ScoreVisible(true);
+    setP2ScoreVisible(true);
     multiStarted = true;
     isStarted = true;
     CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
