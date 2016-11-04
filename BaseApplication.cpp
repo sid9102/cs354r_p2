@@ -337,8 +337,10 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
                 mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(score));
         }
     }
-
-
+    if(multiplayer) {
+        mGUI->updateP1Score(p1lives);
+        mGUI->updateP2Score(p2lives);
+    }
     if(mGUI->isStarted && sceneCreated) {
         if (p1lives <= 0 || p2lives <= 0 || score >= 640) {
             mGUI->setGOverScreenVisible(true);
@@ -377,7 +379,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
         if (index > 0) {
             score += blocks.at(index - 1)->destroy();
-            mGUI->updateP1Score(score);
+            if(!multiplayer) {
+                mGUI->updateP1Score(score);
+            }
             if (soundOn) {
                 switch (blocks.at(index - 1)->type) {
                     case paper:
@@ -399,8 +403,9 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
             }
         }
         // Can be right after p1lives, but won't 'initialize' properly then.
-        mGUI->setTimer(p1lives);
-
+        if(!multiplayer) {
+            mGUI->setTimer(p1lives);
+        }
         if (isServer) {
             if (index == -5) {
                 if (lastHit > 15) {
