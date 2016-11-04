@@ -1,0 +1,9 @@
+
+Final Project Update
+
+We were able to deliver on everything that was promised in the design document.  We were able to
+complete network communication between the server and client computers fairly early on, which helped
+us dedicate time to some unforseen bugs in UI creation that causes us problems at late stages of the
+project.  Unlike before, time was not as much of a problem as it was , allowing us to work more leisurely,
+but also not attempting to add more features not outlined in the design document in order to keep
+our time advantage.
