@@ -91,22 +91,8 @@ void BaseApplication::createCamera(void)
 {
     // Create the camera
     mCamera = mSceneMgr->createCamera("PlayerCam");
-    // Position it at 500 in Z direction
-    if (isServer){
-        //Server
-        mCamera->setPosition(Ogre::Vector3(-740,250,0));
-    }
-    else{
-        //Client
-        mCamera->setPosition(Ogre::Vector3(740,250,0));
-    }
-    // Look back along -Z
-    if(isServer){
-        mCamera->lookAt(Ogre::Vector3(1500,250,0));
-    }
-    else{
-        mCamera->lookAt(Ogre::Vector3(-1500,250,0));
-    }
+    mCamera->setPosition(Ogre::Vector3(-740,250,0));
+    mCamera->lookAt(Ogre::Vector3(1500,250,0));
 
     mCamera->setNearClipDistance(5);
 
@@ -448,6 +434,21 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     {
         multiplayer = mGUI->multiStarted;
         isServer = mGUI->isServer;
+        if (isServer){
+            //Server
+            mCamera->setPosition(Ogre::Vector3(-740,250,0));
+        }
+        else{
+            //Client
+            mCamera->setPosition(Ogre::Vector3(740,250,0));
+        }
+        // Look back along -Z
+        if(isServer){
+            mCamera->lookAt(Ogre::Vector3(1500,250,0));
+        }
+        else{
+            mCamera->lookAt(Ogre::Vector3(-1500,250,0));
+        }
         createScene();
         sceneCreated = true;
     }
