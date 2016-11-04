@@ -883,6 +883,7 @@ bool SGUI::connecting(const CEGUI::EventArgs &e) {
         multiStarted = true;
         isStarted = true;
         setTitleScreenVisible(false);
+        CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
     } else {
         clihos_desc->setText("Malformed IP Address! Check address and try again!");
     }
